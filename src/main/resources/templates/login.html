@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión - 911</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+    <div class="page">
+        <div class="photo op-top"></div>
+        <div class="photo drone-top"></div>
+        <div class="photo op-bottom">
+            <div class="brand-corner">
+                SISTEMA NACIONAL<br>
+                DE ATENCIÓN A EMERGENCIAS<br>
+                Y SEGURIDAD<br>
+                <span class="brand-911">911</span>
+            </div>
+        </div>
+        <div class="photo drone-bottom"></div>
+
+        <div class="login-panel">
+            <div class="login-box">
+                <div class="badge-911"><span>911</span></div>
+
+                <p class="msg error" th:if="${param.error}">Usuario o contraseña incorrectos.</p>
+                <p class="msg success" th:if="${param.logout}">Sesión cerrada correctamente.</p>
+
+                <form method="post" th:action="@{/login}">
+                    <div class="field">
+                        <label>USUARIO</label>
+                        <input type="text" name="username" placeholder="nombre de usuario" required autofocus>
+                    </div>
+                    <div class="field">
+                        <label>CONTRASEÑA</label>
+                        <input type="password" name="password" placeholder="contraseña" required>
+                    </div>
+                    <button type="submit" class="btn-login">Iniciar sesión</button>
+                </form>
+
+                <a href="#" class="forgot">¿Olvidaste tu contraseña?</a>
+                <div class="footer-brand">GREENDESK - INTEGRATEC</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="site-footer">Developed by Juan Carlos Ruiz</div>
+</body>
+</html>

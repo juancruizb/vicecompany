@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel - 911</title>
+</head>
+<body>
+    <h1>Bienvenido al sistema 911</h1>
+    <p>Has iniciado sesión correctamente.</p>
+    <form method="post" th:action="@{/logout}">
+        <button type="submit">Cerrar sesión</button>
+    </form>
+</body>
+</html>
