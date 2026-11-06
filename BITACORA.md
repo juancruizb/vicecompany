@@ -4,13 +4,15 @@ Registro de lo que se ha hecho, por qué, y qué sigue pendiente. Se actualiza e
 
 ## Qué es este proyecto
 
-Aplicación Java con **Spring Boot** que expone una página de login web, pensada para
-eventualmente conectarse a la misma base de datos SQL Server que usa una aplicación
-JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
+Aplicación Java con **Spring Boot** que sincroniza la Vicepresidencia y la Compañía de los
+tickets de **ManageEngine ServiceDesk Plus** (SQL Server) con los atributos del usuario que
+vienen del AD. Reemplaza la página `sync_vice_cia.jsp` de una app JSP/Servlets existente
+(Tomcat, Eclipse). De ahí el nombre: **Vice**/**Company**.
 
 - **Backend**: Spring Boot 4.1.2, Java 21, Maven (con `mvnw`, no requiere Maven instalado).
 - **Vistas**: Thymeleaf.
 - **Seguridad**: Spring Security (login por formulario).
+- **Base de datos**: SQL Server con `spring-boot-starter-jdbc` + `mssql-jdbc` (`JdbcClient`).
 - **Paquete base**: `com.integratec.vicecompany`.
 - **Repositorio**: https://github.com/juancruizb/vicecompany
 
@@ -20,17 +22,45 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
 > para seguir practicando, pero **no es, por ahora, un reemplazo decidido** del login de la
 > app JSP existente. Queda abierto si en el futuro se integra, reemplaza, o se queda como
 > proyecto de aprendizaje aparte.
+>
+> **Actualización 2026-11-06:** al revisar la app JSP se definió el primer uso real:
+> reemplazar su sincronización de Vice/Cía. El login sigue siendo de prueba.
 
 ## Estado actual
 
-- Login funcional con usuario **en memoria** (`operador` / `911911`) — temporal, pendiente
-  reemplazar por la tabla de usuarios real en SQL Server.
-- Diseño visual del login inspirado en un mockup de un sistema 911 (header con drone,
-  operadoras, badge "911"), pero usando fondos generados en CSS/SVG con temática IA + Java
-  (red neuronal, circuito, `public class AI {}`) en vez de fotos reales, ya que no se contaba
-  con las imágenes originales.
-- Rutas protegidas: todo requiere sesión excepto `/login`.
-- Después de login exitoso, redirige a `/home` (página de bienvenida simple, placeholder).
+- **Función principal: sincronización de Vice/Cía de los tickets de ServiceDesk Plus**, que
+  reemplaza al JSP `sync_vice_cia.jsp`. Copia la Vicepresidencia y la Compañía del usuario
+  (atributos que vienen del AD, `UserAdditionalFields.UDF_CHAR2`/`UDF_CHAR1`) a los campos
+  adicionales de sus tickets (`Request_Additional_Fields_1.UDF_CHAR20`/`UDF_CHAR19`).
+- Página `/inconsistencias`: lista los tickets inconsistentes (misma consulta que el JSP),
+  con motivo y si se pueden corregir, un resumen plegable por motivo, búsqueda por ticket,
+  sincronización de un ticket o de todos, y el estado de la sincronización automática.
+- Sincronización automática cada hora (`@Scheduled`), igual que el JSP.
+- Seguridad de escritura: abrir páginas nunca escribe; `vice.sincronizacion.habilitada`
+  (por defecto `false`) bloquea toda escritura; el cron está apagado por defecto.
+- **Probado en producción** (2026-11-06): solo lectura (5482 inconsistencias, igual que el
+  JSP) y sincronización de un ticket (164830). La sincronización automática se probó en local;
+  falta activarla en el servidor.
+- Corre en el servidor del cliente (acceso por RDP), con Java 21 portable, puerto 8090 solo
+  local. Ver "Despliegue en el servidor" más abajo.
+- Login con usuario **en memoria** (`operador` / `911911`), temporal.
+- 27 pruebas automáticas (`./mvnw test`), sin base de datos real.
+
+## Despliegue en el servidor
+
+- Acceso: RDP (no hay VPN). La base solo es accesible desde la red del servidor.
+- El servidor tiene Java 8 (lo usa la app JSP; no tocarlo). ViceCompany usa un JDK 21
+  portable que `iniciar.bat` descomprime de `jdk21.zip` la primera vez.
+- Carpetas en el servidor (disco `F:`, "APP-DBs"):
+  - `F:\ViceCompany\despliegue`: copia de pruebas (jar anterior, sin tarea programada).
+  - `F:\ViceCompany2\despliegue`: copia actual (jar con tarea programada y resumen plegable).
+  - **No ejecutar las dos a la vez** (ambas usan el puerto 8090) y solo una debe tener el cron.
+- Arrancar: `iniciar.bat` en la carpeta `despliegue`; abrir http://localhost:8090/login.
+- Detener: Ctrl+C o cerrar la ventana. Al salir del servidor, **desconectar** la sesión RDP,
+  no cerrar sesión (cerrar sesión detiene la app).
+- Log: `despliegue\logs\vicecompany.log`.
+- Para actualizar: en el Mac `./mvnw package`, copiar `target/vicecompany-0.0.1-SNAPSHOT.jar`
+  como `despliegue/vicecompany.jar` y llevar la carpeta al servidor.
 
 ## Historial de cambios
 
@@ -185,6 +215,14 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
   `static/js/resumen.js` lo repliega a los 5 segundos para dejar a la vista la tabla; su
   título funciona como botón para abrirlo. Si el usuario lo toca antes, no se repliega solo.
 
+### 2026-11-06 (noche) — Segunda copia en el servidor y documentación
+
+- Se llevó el paquete nuevo a una segunda carpeta, `F:\ViceCompany2\despliegue`, y se
+  conservó `F:\ViceCompany\despliegue` para pruebas. No hace falta renombrar la carpeta del
+  JDK: `iniciar.bat` acepta `jdk\` o `jdk-21...\`, y si no hay ninguna descomprime el zip.
+- Se agregó `README.md` (qué hace, configuración, despliegue y operación) y se pusieron al
+  día `CLAUDE.md`, el estado actual y los pendientes de esta bitácora.
+
 ## Conceptos aprendidos
 
 **Refactorizar**: cambiar cómo está escrito u organizado el código sin cambiar lo que hace.
@@ -261,32 +299,36 @@ historial de Git. Para retomar una conversación completa: `claude --continue` o
 
 ## Pendiente / próximos pasos
 
-- [x] Prueba 1 (solo lectura): hecha el 2026-11-06, ver historial.
-- [ ] Investigar por qué 4000+ usuarios no tienen Vice/Cía real en `UserAdditionalFields`
-  (¿faltan en el AD o la importación de usuarios de ServiceDesk no los trae?). Posible
-  reporte por usuario (no por ticket) para corregirlos en el origen.
-- [ ] Mientras el JSP esté cerrado, los tickets nuevos no se sincronizan: reabrirlo o activar
-  ViceCompany cuando termine la prueba 2.
-- [x] Prueba 2 (un ticket 164830): exitosa el 2026-11-06; servidor restaurado.
-- [ ] Poner en marcha la tarea en el servidor: copiar `vicecompany.jar` y
-  `application-local.properties` nuevos, poner `vice.sincronizacion.habilitada=true`, cerrar
-  el JSP y verificar en `logs/vicecompany.log` la ejecución de la hora en punto.
-- [ ] Correr ViceCompany como servicio de Windows (que arranque solo con el servidor).
+**Puesta en marcha (reemplazar el JSP)**
+
+- [ ] En `F:\ViceCompany2\despliegue`: arrancar con escritura en `false` y confirmar en la
+  página "Sincronización automática activa" y, a la hora en punto, "Omitida: modo solo lectura".
+- [ ] Activar: `vice.sincronizacion.habilitada=true`, reiniciar, **cerrar el JSP** y verificar
+  en la página y en `logs/vicecompany.log` la ejecución de la siguiente hora en punto.
+- [ ] Correr ViceCompany como servicio de Windows, para que arranque solo con el servidor y no
+  dependa de una sesión RDP.
+
+**Seguridad**
+
 - [ ] Crear en SQL Server un usuario para ViceCompany (no `sa`): lectura en las tablas de la
   consulta y `UPDATE` solo en `Request_Additional_Fields_1`.
-- [ ] Decidir si la sincronización debe correr sola (`@Scheduled`) además del botón.
-- [ ] Revisar la clase de la app JSP que cuenta inconsistencias (`CountI`) por si la cuenta
-  difiere de la lista.
-- [ ] Login: decidir si sigue con usuarios propios o se conecta a otra fuente. Las tablas de
-  usuarios de ServiceDesk Plus no son recomendables para validar contraseñas.
-  Falta definir:
-  - Si ya existe tabla de usuarios o hay que crearla.
-  - Host/puerto/nombre de la base de datos.
-  - Si las contraseñas están en texto plano o hasheadas.
-  - Si la conexión será local (misma red que la VM) o se expondrá hacia internet.
-- [ ] Considerar hacer privado el repositorio en GitHub antes de agregar entidades JPA con
-  los nombres reales de tablas y columnas. Las credenciales nunca van en el repositorio.
-- [ ] Definir el despliegue definitivo en el servidor (servicio de Windows, usuario de base
-  propio, contraseña fuera del archivo). Por ahora se ejecuta a mano con `iniciar.bat`.
-- [ ] Reemplazar los fondos CSS/SVG por las fotos reales si se consiguen.
+- [ ] Sacar la contraseña de `application-local.properties` (variable de entorno o similar).
+- [ ] Borrar en el servidor `F:\ViceCompany\referencia` y lo demás del proyecto que no sea
+  `despliegue` (tiene la contraseña de `sa` y un token de API).
+- [ ] Login: reemplazar el usuario en memoria `operador`/`911911` por usuarios reales (no
+  usar las tablas de usuarios de ServiceDesk Plus para validar contraseñas).
+- [ ] Considerar hacer privado el repositorio de GitHub.
+
+**Datos**
+
+- [ ] Investigar por qué más de 4000 usuarios no tienen Vice/Cía real en
+  `UserAdditionalFields` (¿faltan en el AD o la importación de usuarios no los trae?
+  `vicepresidencia`/`company` parecen nombres de atributos, no valores). Posible reporte por
+  usuario para corregirlos en el origen.
+- [ ] 5 tickets sin fila en `Request_Additional_Fields_1` (ej. 161223, 158636, 158635): ni el
+  JSP ni ViceCompany pueden escribirles.
+
+**Menores**
+
+- [ ] Reemplazar los fondos CSS/SVG del login por las fotos reales si se consiguen.
 - [ ] Posibles mejoras visuales menores (brillo del badge "911", etc.).
