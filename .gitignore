@@ -38,3 +38,6 @@ bin/
 
 ### Credenciales locales de la base de datos (nunca subir) ###
 /application-local.properties
+
+### Paquete para copiar al servidor (incluye credenciales, nunca subir) ###
+/despliegue/

@@ -34,6 +34,8 @@ Proyecto piloto para aprender IntelliJ IDEA y Spring Boot. El autor viene de Pyt
 - `application-local.properties` (raíz, ignorado por Git): credenciales de la base. Plantilla
   en `application-local.properties.example`.
 - `referencia/` (ignorada por Git): código de la app JSP original, solo para consulta.
+- `despliegue/` (ignorada por Git): paquete para copiar al servidor por RDP (jar, propiedades
+  con credenciales, `iniciar.bat`). La base solo es accesible desde la red del servidor.
 - `src/main/resources/templates/`: HTML procesado por Thymeleaf.
 - `src/main/resources/static/`: CSS, JS e imágenes servidos tal cual.
 

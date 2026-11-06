@@ -112,7 +112,13 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
   en `InconsistenciaSoloLecturaTests`.
 - Se creó `application-local.properties` (local, ignorado) con la conexión de
   `Consultas.getUrl()` y `vice.sincronizacion.habilitada=false`. Desde el Mac el puerto de
-  SQL Server no respondió: probablemente hace falta VPN o estar en la red del cliente.
+  SQL Server no respondió: la base solo es accesible desde la red del cliente, a la que se
+  entra por RDP (no hay VPN).
+- Por eso la prueba se hará **en el servidor**: carpeta local `despliegue/` (ignorada por
+  Git) con `vicecompany.jar`, `application-local.properties` (con `server.port=8090` para no
+  chocar con Tomcat y `server.address=127.0.0.1` para que solo se abra desde el propio
+  servidor), `iniciar.bat` y `LEEME.txt`. Se comprobó que el paquete arranca. Requiere
+  Java 21 en el servidor.
 
 ## Conceptos aprendidos
 
@@ -186,8 +192,9 @@ historial de Git. Para retomar una conversación completa: `claude --continue` o
 
 ## Pendiente / próximos pasos
 
-- [ ] Prueba 1 (solo lectura): con acceso a la red de la base, abrir `/inconsistencias`,
-  revisar el resumen de candidatos y validarlo.
+- [ ] Prueba 1 (solo lectura): copiar `despliegue/` al servidor por RDP, ejecutar
+  `iniciar.bat`, abrir http://localhost:8090/inconsistencias y validar el resumen de
+  candidatos. Verificar antes que el servidor tenga Java 21 (`java -version`).
 - [ ] Prueba 2 (un ticket): elegir un candidato, poner `vice.sincronizacion.habilitada=true`,
   sincronizar solo ese ticket, comprobarlo en ServiceDesk Plus y volver a `false`.
   Solo después, "Sincronizar todo".
@@ -207,6 +214,7 @@ historial de Git. Para retomar una conversación completa: `claude --continue` o
   - Si la conexión será local (misma red que la VM) o se expondrá hacia internet.
 - [ ] Considerar hacer privado el repositorio en GitHub antes de agregar entidades JPA con
   los nombres reales de tablas y columnas. Las credenciales nunca van en el repositorio.
-- [ ] Construir el `.jar` ejecutable (`./mvnw package`) y definir cómo se desplegará en la VM.
+- [ ] Definir el despliegue definitivo en el servidor (servicio de Windows, usuario de base
+  propio, contraseña fuera del archivo). Por ahora se ejecuta a mano con `iniciar.bat`.
 - [ ] Reemplazar los fondos CSS/SVG por las fotos reales si se consiguen.
 - [ ] Posibles mejoras visuales menores (brillo del badge "911", etc.).
