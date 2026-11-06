@@ -157,6 +157,10 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
   tomada del atributo del usuario (AD-Cía), y el ticket quedó "Sincronizado". La Vice, que
   ya coincidía, no se tocó.
 - Queda validado el `UPDATE` por ticket en producción.
+- **Decisión (2026-11-06):** la Vice/Cía de un ticket debe reflejar la **actual** del usuario
+  en el AD, no la que tenía cuando se creó el ticket. Si un usuario cambia de vicepresidencia,
+  la sincronización actualiza también sus tickets anteriores (igual que el JSP). No se limita
+  el lote por fecha.
 - Al terminar se dejó todo como estaba: `vice.sincronizacion.habilitada=false`, ViceCompany
   detenido y el JSP abierto de nuevo (sigue sincronizando los tickets nuevos). En el servidor
   queda `F:\ViceCompany\despliegue` listo para volver a usarse.
