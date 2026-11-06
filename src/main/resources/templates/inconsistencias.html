@@ -26,14 +26,14 @@
         </form>
 
         <!-- Lote: solo en la vista general. -->
-        <form th:if="${error == null and ticket == null}" method="post"
+        <form th:if="${sincronizacionHabilitada and error == null and ticket == null}" method="post"
               th:action="@{/inconsistencias/sincronizar}"
               onsubmit="return confirm('¿Copiar Vice y Cía del directorio a TODOS los tickets inconsistentes?');">
             <button type="submit" class="peligro">Sincronizar todo</button>
         </form>
 
         <!-- Prueba: solo el ticket que se está viendo. -->
-        <form th:if="${error == null and ticket != null and not #lists.isEmpty(inconsistencias)}"
+        <form th:if="${sincronizacionHabilitada and error == null and ticket != null and not #lists.isEmpty(inconsistencias)}"
               method="post" th:action="@{/inconsistencias/sincronizar}"
               onsubmit="return confirm('¿Sincronizar solo este ticket?');">
             <input type="hidden" name="ticket" th:value="${ticket}">
@@ -42,6 +42,7 @@
     </div>
 </header>
 
+<p class="lectura" th:unless="${sincronizacionHabilitada}">Modo solo lectura: no se modifica ningún ticket.</p>
 <p class="aviso" th:if="${mensaje}" th:text="${mensaje}">Sincronización completada</p>
 <p class="error" th:if="${mensajeError}" th:text="${mensajeError}">Falló</p>
 <p class="error" th:if="${error}" th:text="${error}">Error</p>

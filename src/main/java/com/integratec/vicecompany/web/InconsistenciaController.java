@@ -24,11 +24,14 @@ public class InconsistenciaController {
 
     private final InconsistenciaRepository repository;
     private final String servicedeskUrl;
+    private final boolean sincronizacionHabilitada;
 
     public InconsistenciaController(InconsistenciaRepository repository,
-                                    @Value("${vice.servicedesk.url}") String servicedeskUrl) {
+                                    @Value("${vice.servicedesk.url}") String servicedeskUrl,
+                                    @Value("${vice.sincronizacion.habilitada:false}") boolean sincronizacionHabilitada) {
         this.repository = repository;
         this.servicedeskUrl = servicedeskUrl;
+        this.sincronizacionHabilitada = sincronizacionHabilitada;
     }
 
     /**
@@ -39,6 +42,7 @@ public class InconsistenciaController {
     public String inconsistencias(@RequestParam(required = false) Long ticket, Model model) {
         model.addAttribute("servicedeskUrl", servicedeskUrl);
         model.addAttribute("ticket", ticket);
+        model.addAttribute("sincronizacionHabilitada", sincronizacionHabilitada);
         try {
             if (ticket == null) {
                 var todas = repository.buscarTodas();
@@ -61,6 +65,15 @@ public class InconsistenciaController {
      */
     @PostMapping("/inconsistencias/sincronizar")
     public String sincronizar(@RequestParam(required = false) Long ticket, RedirectAttributes redirect) {
+        if (ticket != null) {
+            redirect.addAttribute("ticket", ticket);
+        }
+        if (!sincronizacionHabilitada) {
+            log.warn("Sincronización rechazada: modo solo lectura (ticket={})", ticket);
+            redirect.addFlashAttribute("mensajeError",
+                    "Modo solo lectura: la sincronización está desactivada (vice.sincronizacion.habilitada=false).");
+            return "redirect:/inconsistencias";
+        }
         try {
             ResultadoSincronizacion resultado = (ticket == null)
                     ? repository.sincronizar()
@@ -70,9 +83,6 @@ public class InconsistenciaController {
         } catch (DataAccessException e) {
             log.error("Falló la sincronización de Vice/Cía (ticket={})", ticket, e);
             redirect.addFlashAttribute("mensajeError", "La sincronización falló; no se modificó ningún ticket.");
-        }
-        if (ticket != null) {
-            redirect.addAttribute("ticket", ticket);
         }
         return "redirect:/inconsistencias";
     }

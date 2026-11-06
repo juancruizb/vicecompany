@@ -29,7 +29,8 @@ import com.integratec.vicecompany.inconsistencias.InconsistenciaRepository;
 import com.integratec.vicecompany.inconsistencias.InconsistenciaRepository.ResultadoSincronizacion;
 
 /** Prueba la página sin base de datos real: el repositorio se reemplaza por un mock. */
-@WebMvcTest(InconsistenciaController.class)
+@WebMvcTest(controllers = InconsistenciaController.class,
+        properties = "vice.sincronizacion.habilitada=true")
 @WithMockUser
 class InconsistenciaControllerTests {
 

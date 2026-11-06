@@ -8,3 +8,6 @@ spring.datasource.username=USUARIO
 spring.datasource.password=CONTRASENA
 
 vice.servicedesk.url=https://HOST_SERVICEDESK
+
+# false = solo lectura (recomendado para la primera prueba).
+vice.sincronizacion.habilitada=false

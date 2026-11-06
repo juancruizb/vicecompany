@@ -166,3 +166,13 @@ tbody tr:hover {
 .ejemplo {
     margin-right: 12px;
 }
+
+.lectura {
+    width: calc(100% - 32px);
+    max-width: 1500px;
+    margin: 0 auto 12px;
+    padding: 8px 12px;
+    border-left: 4px solid #e7ab0c;
+    background: var(--tabla);
+    color: #e7ab0c;
+}

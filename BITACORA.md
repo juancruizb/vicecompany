@@ -107,6 +107,12 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
     distinto del AD; "sin dato en AD" si el usuario no tiene un valor real; "Ticket sin
     campos adicionales" si no hay fila en `Request_Additional_Fields_1` (el `UPDATE` no la crea).
   - Pruebas: `InconsistenciaTests` (10 casos de motivos y resumen) y 8 del controlador.
+- Interruptor `vice.sincronizacion.habilitada` (por defecto `false`): en solo lectura no se
+  muestran los botones y el servidor rechaza cualquier `POST` de sincronización. 3 pruebas
+  en `InconsistenciaSoloLecturaTests`.
+- Se creó `application-local.properties` (local, ignorado) con la conexión de
+  `Consultas.getUrl()` y `vice.sincronizacion.habilitada=false`. Desde el Mac el puerto de
+  SQL Server no respondió: probablemente hace falta VPN o estar en la red del cliente.
 
 ## Conceptos aprendidos
 
@@ -180,10 +186,11 @@ historial de Git. Para retomar una conversación completa: `claude --continue` o
 
 ## Pendiente / próximos pasos
 
-- [ ] Probar `/inconsistencias` contra la base real: copiar
-  `application-local.properties.example` como `application-local.properties` y completar.
-  Revisar el resumen de candidatos, sincronizar un ticket de ejemplo de cada grupo
-  corregible y comprobarlo en ServiceDesk Plus. Solo después, "Sincronizar todo".
+- [ ] Prueba 1 (solo lectura): con acceso a la red de la base, abrir `/inconsistencias`,
+  revisar el resumen de candidatos y validarlo.
+- [ ] Prueba 2 (un ticket): elegir un candidato, poner `vice.sincronizacion.habilitada=true`,
+  sincronizar solo ese ticket, comprobarlo en ServiceDesk Plus y volver a `false`.
+  Solo después, "Sincronizar todo".
 - [ ] Decidir qué hacer con los tickets que no se corrigen (usuario sin Vice/Cía real en el
   AD, o ticket sin fila de campos adicionales).
 - [ ] Crear en SQL Server un usuario para ViceCompany (no `sa`): lectura en las tablas de la
