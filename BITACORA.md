@@ -117,8 +117,11 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
 - Por eso la prueba se hará **en el servidor**: carpeta local `despliegue/` (ignorada por
   Git) con `vicecompany.jar`, `application-local.properties` (con `server.port=8090` para no
   chocar con Tomcat y `server.address=127.0.0.1` para que solo se abra desde el propio
-  servidor), `iniciar.bat` y `LEEME.txt`. Se comprobó que el paquete arranca. Requiere
-  Java 21 en el servidor.
+  servidor), `iniciar.bat` y `LEEME.txt`. Se comprobó que el paquete arranca.
+- El servidor tiene **Java 8** (1.8.0_321), que usa la app JSP y no se debe cambiar. Se agregó
+  `jdk21.zip` (Temurin 21.0.13+9 para Windows x64, checksum SHA-256 verificado contra
+  Adoptium); `iniciar.bat` lo descomprime la primera vez en `jdk\` y lo usa solo para
+  ViceCompany, sin tocar el PATH ni el Java del sistema. Memoria limitada con `-Xmx512m`.
 
 ## Conceptos aprendidos
 
@@ -194,7 +197,7 @@ historial de Git. Para retomar una conversación completa: `claude --continue` o
 
 - [ ] Prueba 1 (solo lectura): copiar `despliegue/` al servidor por RDP, ejecutar
   `iniciar.bat`, abrir http://localhost:8090/inconsistencias y validar el resumen de
-  candidatos. Verificar antes que el servidor tenga Java 21 (`java -version`).
+  candidatos.
 - [ ] Prueba 2 (un ticket): elegir un candidato, poner `vice.sincronizacion.habilitada=true`,
   sincronizar solo ese ticket, comprobarlo en ServiceDesk Plus y volver a `false`.
   Solo después, "Sincronizar todo".
