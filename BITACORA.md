@@ -71,6 +71,10 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
 - Se creó `CLAUDE.md`, que Claude Code lee al iniciar cada sesión: indica leer esta bitácora,
   responder en español y subir todo a GitHub, y documenta comandos, estructura y cuidados.
 - Acuerdo: todo commit se sube a GitHub.
+- Se creó la carpeta local `referencia/`, ignorada por Git, para guardar el material de la
+  app JSP (consultas SQL, DAO/JDBC, estructura de tablas). Motivo: el repositorio en GitHub
+  es **público** y ese material describe una base de datos en producción. Antes de copiar
+  archivos ahí, quitar contraseñas, IPs y usuarios de base de datos.
 
 ## Conceptos aprendidos
 
@@ -137,7 +141,9 @@ historial de Git. Para retomar una conversación completa: `claude --continue` o
   - Si las contraseñas están en texto plano o hasheadas.
   - Si la conexión será local (misma red que la VM) o se expondrá hacia internet.
 - [ ] Revisar el código DAO/JDBC de la app JSP existente para entender la consulta SQL y
-  las condiciones de actualización que maneja.
+  las condiciones de actualización que maneja. Copiarlo a `referencia/` (local, no se sube).
+- [ ] Considerar hacer privado el repositorio en GitHub antes de agregar entidades JPA con
+  los nombres reales de tablas y columnas. Las credenciales nunca van en el repositorio.
 - [ ] Construir el `.jar` ejecutable (`./mvnw package`) y definir cómo se desplegará en la VM.
 - [ ] Reemplazar los fondos CSS/SVG por las fotos reales si se consiguen.
 - [ ] Posibles mejoras visuales menores (brillo del badge "911", etc.).

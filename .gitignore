@@ -33,3 +33,5 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+### Material de referencia de la app JSP (privado, nunca subir) ###
+/referencia/
