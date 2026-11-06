@@ -143,9 +143,40 @@ tbody tr:hover {
     margin: 0 auto 24px;
 }
 
-.resumen h2 {
+.resumen > summary {
+    display: inline-block;
     margin: 8px 0;
-    font-size: 1.1rem;
+    padding: 6px 14px;
+    font-size: 1.05rem;
+    font-weight: bold;
+    color: #e7ab0c;
+    border: 1px solid #e7ab0c;
+    border-radius: 4px;
+    cursor: pointer;
+    list-style: none; /* oculta el triángulo por defecto */
+    user-select: none;
+}
+
+.resumen > summary::-webkit-details-marker {
+    display: none;
+}
+
+.resumen > summary::before {
+    content: "▸ ";
+}
+
+.resumen[open] > summary::before {
+    content: "▾ ";
+}
+
+.resumen > summary:hover {
+    background: #e7ab0c;
+    color: var(--fondo);
+}
+
+.resumen-total {
+    font-weight: normal;
+    opacity: 0.8;
 }
 
 .resumen p {

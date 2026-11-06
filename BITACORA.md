@@ -181,6 +181,9 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
   mantiene los `.bat` con CRLF.
 - `despliegue/` actualizado: jar nuevo y `application-local.properties` con cron horario y log
   en archivo (escritura aún en `false`).
+- El "Resumen de candidatos" ahora es un bloque plegable (`<details>`): se muestra al cargar y
+  `static/js/resumen.js` lo repliega a los 5 segundos para dejar a la vista la tabla; su
+  título funciona como botón para abrirlo. Si el usuario lo toca antes, no se repliega solo.
 
 ## Conceptos aprendidos
 

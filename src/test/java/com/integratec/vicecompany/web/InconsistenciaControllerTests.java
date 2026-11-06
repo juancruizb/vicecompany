@@ -57,6 +57,8 @@ class InconsistenciaControllerTests {
                 .andExpect(content().string(containsString("woID=164738")))
                 .andExpect(content().string(containsString("VICEPRESIDENCIA TECNOLOGIA")))
                 .andExpect(content().string(containsString("Resumen de candidatos")))
+                .andExpect(content().string(containsString("<details class=\"resumen\" id=\"resumen\" open")))
+                .andExpect(content().string(containsString("/js/resumen.js")))
                 .andExpect(content().string(containsString("Vice vacío; Cía vacío")))
                 .andExpect(content().string(containsString("Sincronizar todo")));
     }

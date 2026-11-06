@@ -58,8 +58,14 @@
 <p class="error" th:if="${error == null and ticket != null and #lists.isEmpty(inconsistencias)}"
    th:text="'No existe el ticket ' + ${ticket} + '.'">No existe</p>
 
-<section class="resumen" th:if="${resumen != null and not #lists.isEmpty(resumen)}">
-    <h2>Resumen de candidatos</h2>
+<!-- <details> es un bloque plegable nativo: el <summary> es el botón para abrir/cerrar.
+     Se muestra abierto y resumen.js lo repliega a los pocos segundos. -->
+<details class="resumen" id="resumen" open
+         th:if="${resumen != null and not #lists.isEmpty(resumen)}">
+    <summary>
+        Resumen de candidatos
+        <span class="resumen-total" th:text="'(' + ${#lists.size(resumen)} + ' grupos)'">(7 grupos)</span>
+    </summary>
     <p>Elige un ticket de ejemplo de cada grupo y prueba con <em>Sincronizar este ticket</em>
         antes de sincronizar todo.</p>
     <table>
@@ -84,7 +90,7 @@
         </tr>
         </tbody>
     </table>
-</section>
+</details>
 
 <table th:if="${error == null and not #lists.isEmpty(inconsistencias)}">
     <thead>
@@ -123,5 +129,6 @@
     </tr>
     </tbody>
 </table>
+<script th:src="@{/js/resumen.js}" defer></script>
 </body>
 </html>
