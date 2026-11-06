@@ -14,9 +14,12 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
 - **Paquete base**: `com.integratec.vicecompany`.
 - **Repositorio**: https://github.com/juancruizb/vicecompany
 
-> **Decisión abierta (sin responder aún):** ¿este login es un **reemplazo** del login de la
-> app JSP vieja, o es un **módulo nuevo** que convive aparte y solo comparte la base de datos?
-> Esto define cómo seguimos con la conexión a SQL Server más adelante.
+> **Propósito real (aclarado 2026-11-05):** este proyecto nació como **piloto para aprender
+> IntelliJ IDEA** — es el primer proyecto Java del autor usando este IDE (antes trabajaba con
+> Eclipse). La idea de conectarlo a la base de datos SQL Server real es una extensión natural
+> para seguir practicando, pero **no es, por ahora, un reemplazo decidido** del login de la
+> app JSP existente. Queda abierto si en el futuro se integra, reemplaza, o se queda como
+> proyecto de aprendizaje aparte.
 
 ## Estado actual
 
