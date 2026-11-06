@@ -62,6 +62,72 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
   primer commit, y se conectó al repositorio remoto en GitHub
   (`https://github.com/juancruizb/vicecompany.git`).
 
+### 2026-11-06 — Repaso de conceptos y CLAUDE.md
+
+- Se aclaró en esta bitácora el propósito del proyecto: piloto para aprender IntelliJ.
+- Se recorrieron `pom.xml`, `SecurityConfig`, las plantillas Thymeleaf y la carpeta `static/`.
+- Prueba: se comentó `.loginPage("/login")` para ver la página de login que Spring Security
+  genera por defecto ("Please sign in"). Luego se restauró la línea.
+- Se creó `CLAUDE.md`, que Claude Code lee al iniciar cada sesión: indica leer esta bitácora,
+  responder en español y subir todo a GitHub, y documenta comandos, estructura y cuidados.
+- Acuerdo: todo commit se sube a GitHub.
+
+## Conceptos aprendidos
+
+**Refactorizar**: cambiar cómo está escrito u organizado el código sin cambiar lo que hace.
+Viene de "factorizar" en matemáticas: `6x + 9 = 3(2x + 3)` vale lo mismo, pero se sacó el
+factor común. En código, es sacar lo repetido a un solo lugar. En IntelliJ: menú Refactor,
+`⌃T`, o `⇧F6` para renombrar en todo el proyecto.
+
+**`pom.xml` (Project Object Model)**: la ficha del proyecto para Maven. Define nombre,
+versión, versión de Java, dependencias (como `requirements.txt` o `pyproject.toml`) y cómo
+construir el `.jar`. Hereda de `spring-boot-starter-parent`, por eso las dependencias no
+llevan versión. `SNAPSHOT` = versión en desarrollo.
+
+**`SecurityConfig`**: el portero de la app. `@Configuration` marca la clase para que Spring
+la lea al arrancar; cada `@Bean` crea una pieza que Spring guarda y entrega donde se necesite:
+- `filterChain`: qué rutas son públicas (`permitAll`) y cuáles piden sesión; usa nuestra
+  página de login y redirige a `/home`.
+- `passwordEncoder`: las contraseñas se guardan hasheadas (bcrypt), no en texto plano.
+- `userDetailsService`: de dónde salen los usuarios. Hoy, en memoria; es lo que se
+  reemplazará al conectar SQL Server.
+
+**Íconos verdes en el margen de IntelliJ**: marcan beans de Spring. Al hacer clic, muestran
+dónde se usa o de dónde viene cada bean. Otras ayudas visuales: escudo en rutas de Spring
+Security, pistas de parámetros en gris, autor según Git, y el bombillo (`⌥↩`) con sugerencias.
+
+**Sangría en Java**: no es obligatoria como en Python. Los bloques los definen `{ }` y las
+instrucciones terminan en `;`. Se indenta por convención; `⌥⌘L` reformatea el archivo.
+
+**Thymeleaf**: motor de plantillas, como los templates de Django, pero con atributos `th:`
+dentro del HTML en lugar de `{% %}`:
+- `${...}` lee datos (`th:if="${param.error}"`).
+- `@{...}` arma URLs (`th:href="@{/css/login.css}"`).
+- `th:action` en un formulario agrega solo el token CSRF (como `{% csrf_token %}`).
+
+**`templates/` vs `static/`**:
+- HTML (esqueleto), CSS (apariencia) y JS (comportamiento) arman juntos la vista.
+- `templates/` guarda el HTML que Thymeleaf procesa en el servidor.
+- `static/` guarda CSS, JS e imágenes que van tal cual al navegador. Se sirven desde la raíz
+  (`static/css/login.css` → `/css/login.css`), sin `collectstatic`.
+- Una ruta estática nueva (por ejemplo `/js/**`) debe agregarse a `permitAll()` si se usa en
+  la página de login.
+
+**Equivalentes de Django en Spring**:
+- ORM → Spring Data JPA (Hibernate). Con una base ajena, usar `ddl-auto=none` o `validate`.
+- Django REST Framework → `@RestController` (ya incluido en `starter-webmvc`).
+- Django Admin → no hay uno incluido; se construye a mano (Thymeleaf) o con JHipster.
+  "Spring Boot Admin" solo monitorea la app, no administra datos.
+- Ver y editar la base desde el IDE: ventana Database de IntelliJ Ultimate.
+
+**JetBrains**: IntelliJ y PyCharm comparten la misma base (IntelliJ Platform), por eso se
+usan igual. Cambia el soporte de cada lenguaje: JDK/Maven/Spring en uno, intérprete/venv/pip
+en el otro.
+
+**Memoria de Claude Code**: no recuerda conversaciones anteriores por sí mismo. Lo que pasa
+de una sesión a otra: sus notas de memoria, `CLAUDE.md` (lo lee solo), esta bitácora y el
+historial de Git. Para retomar una conversación completa: `claude --continue` o `claude --resume`.
+
 ## Pendiente / próximos pasos
 
 - [ ] Conectar el login a la base de datos SQL Server real (reemplazar usuario en memoria).
