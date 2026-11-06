@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inconsistencias Vice/Cía</title>
+    <link rel="stylesheet" th:href="@{/css/inconsistencias.css}">
+</head>
+<body>
+<header class="barra">
+    <a th:href="@{/home}">← Regresar</a>
+    <h1 th:if="${error == null}" th:text="${#lists.size(inconsistencias)} + ' inconsistencias encontradas'">0 inconsistencias</h1>
+    <h1 th:if="${error != null}">Inconsistencias</h1>
+    <!-- El formulario va arriba, antes de la tabla larga, para que el token CSRF se genere
+         antes de que Tomcat empiece a enviar la respuesta (ver "Cuidados" en CLAUDE.md). -->
+    <form th:if="${error == null}" method="post" th:action="@{/inconsistencias/sincronizar}"
+          onsubmit="return confirm('¿Copiar Vice y Cía del directorio a los tickets?');">
+        <button type="submit">Sincronizar</button>
+    </form>
+</header>
+
+<p class="aviso" th:if="${mensaje}" th:text="${mensaje}">Sincronización completada</p>
+<p class="error" th:if="${mensajeError}" th:text="${mensajeError}">Falló</p>
+<p class="error" th:if="${error}" th:text="${error}">Error</p>
+
+<table th:if="${error == null}">
+    <thead>
+    <tr>
+        <th>N.º</th>
+        <th>Ticket</th>
+        <th>Fecha</th>
+        <th>Solicitante</th>
+        <th>Vice</th>
+        <th>Cía</th>
+        <th>AD-Vice</th>
+        <th>AD-Cía</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="i, estado : ${inconsistencias}">
+        <td class="centro" th:text="${estado.count}">1</td>
+        <td><a target="_blank" rel="noopener"
+               th:href="@{${servicedeskUrl} + '/WorkOrder.do'(woMode='viewWO', woID=${i.ticket})}"
+               th:text="${i.ticket}">164738</a></td>
+        <td th:text="${i.fecha}">06 Nov 2026</td>
+        <td><a target="_blank" rel="noopener"
+               th:href="@{${servicedeskUrl} + '/ESM.do'(type='users', viewType='details', userId=${i.userId})}"
+               th:text="${i.solicitante}">Nombre</a></td>
+        <td class="centro" th:text="${i.vice}">N/D</td>
+        <td class="centro" th:text="${i.cia}">N/D</td>
+        <td class="centro" th:text="${i.adVice}">N/D</td>
+        <td class="centro" th:text="${i.adCia}">N/D</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

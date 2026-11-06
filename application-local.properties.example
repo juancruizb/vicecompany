@@ -1,0 +1,10 @@
+# Copiar este archivo como application-local.properties (misma carpeta) y completar.
+# application-local.properties está en .gitignore: nunca se sube a GitHub.
+#
+# Usar un usuario de SQL Server con permiso de solo lectura, no "sa".
+
+spring.datasource.url=jdbc:sqlserver://HOST:PUERTO;databaseName=servicedesk;encrypt=true;trustServerCertificate=true
+spring.datasource.username=USUARIO
+spring.datasource.password=CONTRASENA
+
+vice.servicedesk.url=https://HOST_SERVICEDESK

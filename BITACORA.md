@@ -76,6 +76,28 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
   es **público** y ese material describe una base de datos en producción. Antes de copiar
   archivos ahí, quitar contraseñas, IPs y usuarios de base de datos.
 
+### 2026-11-06 (tarde) — Página de inconsistencias Vice/Cía
+
+- Se copiaron a `referencia/` (local, no se sube) `Consultas.java`, `sync_vice_cia.jsp` y
+  `gui.png` de la app JSP.
+- Hallazgo: la base `servicedesk` es la de **ManageEngine ServiceDesk Plus**. La app JSP es
+  una herramienta propia que corrige datos en esa base. Vice y Cía son atributos del usuario
+  que vienen del Active Directory (`UserAdditionalFields.UDF_CHAR2`/`UDF_CHAR1`) y se
+  quieren en cada ticket (`Request_Additional_Fields_1.UDF_CHAR20`/`UDF_CHAR19`).
+- Se creó la página `/inconsistencias` (enlazada desde `/home`):
+  - Lista los tickets inconsistentes con la misma consulta que `getInconsistencies()`.
+  - Botón **Sincronizar** (`POST` con CSRF) que copia Vice/Cía del usuario a sus tickets,
+    en una transacción.
+  - Diferencias con el JSP: abrir la página **no** modifica la base (el JSP actualizaba en
+    cada visita y cada hora); no se copian valores vacíos ni de relleno
+    (`vicepresidencia`/`company`), que dejaban tickets inconsistentes para siempre; se usan
+    dos `UPDATE` con `JOIN` en lugar de uno por ticket.
+- Conexión: `spring-boot-starter-jdbc` + driver `mssql-jdbc`, consultas con `JdbcClient`.
+  Los datos reales van en `application-local.properties` (raíz, ignorado por Git); hay una
+  plantilla en `application-local.properties.example`.
+- Pruebas: `InconsistenciaControllerTests` (5 casos, base simulada con `@MockitoBean`).
+- **Aún no se probó contra la base real.**
+
 ## Conceptos aprendidos
 
 **Refactorizar**: cambiar cómo está escrito u organizado el código sin cambiar lo que hace.
@@ -128,20 +150,41 @@ dentro del HTML en lugar de `{% %}`:
 usan igual. Cambia el soporte de cada lenguaje: JDK/Maven/Spring en uno, intérprete/venv/pip
 en el otro.
 
+**`JdbcClient`**: ejecuta SQL escrito a mano, como `connection.cursor().execute()` en
+Django pero con la conexión y el cierre de recursos a cargo de Spring. Se eligió en vez de
+JPA porque la base es de otro producto y las consultas ya existían.
+
+**`@Transactional`**: todo el método se confirma o se deshace junto, como
+`transaction.atomic()` en Django.
+
+**Post/Redirect/Get**: un `POST` que modifica datos termina con `redirect:`, para que
+recargar la página no repita la acción. Los "flash attributes" sobreviven a esa redirección,
+como `messages.success()` en Django.
+
+**`@MockitoBean`**: en una prueba, reemplaza un bean real (el repositorio) por uno simulado,
+para probar el controlador sin base de datos.
+
 **Memoria de Claude Code**: no recuerda conversaciones anteriores por sí mismo. Lo que pasa
 de una sesión a otra: sus notas de memoria, `CLAUDE.md` (lo lee solo), esta bitácora y el
 historial de Git. Para retomar una conversación completa: `claude --continue` o `claude --resume`.
 
 ## Pendiente / próximos pasos
 
-- [ ] Conectar el login a la base de datos SQL Server real (reemplazar usuario en memoria).
+- [ ] Probar `/inconsistencias` contra la base real: copiar
+  `application-local.properties.example` como `application-local.properties`, completar, y
+  primero solo mirar la lista antes de pulsar Sincronizar.
+- [ ] Crear en SQL Server un usuario para ViceCompany (no `sa`): lectura en las tablas de la
+  consulta y `UPDATE` solo en `Request_Additional_Fields_1`.
+- [ ] Decidir si la sincronización debe correr sola (`@Scheduled`) además del botón.
+- [ ] Revisar la clase de la app JSP que cuenta inconsistencias (`CountI`) por si la cuenta
+  difiere de la lista.
+- [ ] Login: decidir si sigue con usuarios propios o se conecta a otra fuente. Las tablas de
+  usuarios de ServiceDesk Plus no son recomendables para validar contraseñas.
   Falta definir:
   - Si ya existe tabla de usuarios o hay que crearla.
   - Host/puerto/nombre de la base de datos.
   - Si las contraseñas están en texto plano o hasheadas.
   - Si la conexión será local (misma red que la VM) o se expondrá hacia internet.
-- [ ] Revisar el código DAO/JDBC de la app JSP existente para entender la consulta SQL y
-  las condiciones de actualización que maneja. Copiarlo a `referencia/` (local, no se sube).
 - [ ] Considerar hacer privado el repositorio en GitHub antes de agregar entidades JPA con
   los nombres reales de tablas y columnas. Las credenciales nunca van en el repositorio.
 - [ ] Construir el `.jar` ejecutable (`./mvnw package`) y definir cómo se desplegará en la VM.

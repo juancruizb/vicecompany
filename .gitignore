@@ -35,3 +35,6 @@ bin/
 .DS_Store
 ### Material de referencia de la app JSP (privado, nunca subir) ###
 /referencia/
+
+### Credenciales locales de la base de datos (nunca subir) ###
+/application-local.properties

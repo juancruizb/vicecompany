@@ -7,6 +7,7 @@
 <body>
     <h1>Bienvenido al sistema 911</h1>
     <p>Has iniciado sesión correctamente.</p>
+    <p><a th:href="@{/inconsistencias}">Ver inconsistencias Vice/Cía</a></p>
     <form method="post" th:action="@{/logout}">
         <button type="submit">Cerrar sesión</button>
     </form>

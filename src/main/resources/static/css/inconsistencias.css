@@ -1,0 +1,110 @@
+/* Colores tomados de sync_vice_cia.jsp */
+:root {
+    --fondo: #1E202A;
+    --tabla: #252A41;
+    --encabezado: #2D2C32;
+    --enlace: #BBA549;
+    --texto: #FFFFFF;
+}
+
+body {
+    margin: 0;
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+a {
+    color: var(--enlace);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.barra {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--fondo);
+    padding: 12px 16px;
+    text-align: center;
+}
+
+.barra a {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.barra h1 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.barra form {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.barra button {
+    background: var(--tabla);
+    color: #e7ab0c;
+    border: 1px solid #e7ab0c;
+    border-radius: 4px;
+    padding: 6px 14px;
+    cursor: pointer;
+}
+
+.barra button:hover {
+    background: #e7ab0c;
+    color: var(--fondo);
+}
+
+.error,
+.aviso {
+    max-width: 600px;
+    margin: 16px auto;
+    padding: 16px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.error {
+    background: #5a1e1e;
+}
+
+.aviso {
+    background: #1e4a2e;
+}
+
+table {
+    width: calc(100% - 32px);
+    max-width: 1500px;
+    margin: 0 auto 32px;
+    border-collapse: collapse;
+    background: var(--tabla);
+}
+
+th {
+    position: sticky;
+    top: 52px; /* debajo de la barra */
+    background: var(--encabezado);
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+}
+
+tbody tr:hover {
+    background: var(--fondo);
+}
+
+.centro {
+    text-align: center;
+}
