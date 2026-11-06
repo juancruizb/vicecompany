@@ -7,23 +7,77 @@
     <link rel="stylesheet" th:href="@{/css/inconsistencias.css}">
 </head>
 <body>
+<!-- Los formularios van arriba, antes de la tabla larga, para que el token CSRF se genere
+     antes de que Tomcat empiece a enviar la respuesta (ver "Cuidados" en CLAUDE.md). -->
 <header class="barra">
-    <a th:href="@{/home}">← Regresar</a>
-    <h1 th:if="${error == null}" th:text="${#lists.size(inconsistencias)} + ' inconsistencias encontradas'">0 inconsistencias</h1>
-    <h1 th:if="${error != null}">Inconsistencias</h1>
-    <!-- El formulario va arriba, antes de la tabla larga, para que el token CSRF se genere
-         antes de que Tomcat empiece a enviar la respuesta (ver "Cuidados" en CLAUDE.md). -->
-    <form th:if="${error == null}" method="post" th:action="@{/inconsistencias/sincronizar}"
-          onsubmit="return confirm('¿Copiar Vice y Cía del directorio a los tickets?');">
-        <button type="submit">Sincronizar</button>
-    </form>
+    <a th:if="${ticket == null}" th:href="@{/home}">← Regresar</a>
+    <a th:if="${ticket != null}" th:href="@{/inconsistencias}">← Ver todas</a>
+
+    <h1 th:if="${error == null and ticket == null}"
+        th:text="${#lists.size(inconsistencias)} + ' inconsistencias encontradas'">0 inconsistencias</h1>
+    <h1 th:if="${ticket != null}" th:text="'Ticket ' + ${ticket}">Ticket</h1>
+    <h1 th:if="${error != null and ticket == null}">Inconsistencias</h1>
+
+    <div class="acciones">
+        <form method="get" th:action="@{/inconsistencias}">
+            <input type="number" name="ticket" min="1" placeholder="N.º de ticket" required
+                   th:value="${ticket}">
+            <button type="submit">Buscar</button>
+        </form>
+
+        <!-- Lote: solo en la vista general. -->
+        <form th:if="${error == null and ticket == null}" method="post"
+              th:action="@{/inconsistencias/sincronizar}"
+              onsubmit="return confirm('¿Copiar Vice y Cía del directorio a TODOS los tickets inconsistentes?');">
+            <button type="submit" class="peligro">Sincronizar todo</button>
+        </form>
+
+        <!-- Prueba: solo el ticket que se está viendo. -->
+        <form th:if="${error == null and ticket != null and not #lists.isEmpty(inconsistencias)}"
+              method="post" th:action="@{/inconsistencias/sincronizar}"
+              onsubmit="return confirm('¿Sincronizar solo este ticket?');">
+            <input type="hidden" name="ticket" th:value="${ticket}">
+            <button type="submit">Sincronizar este ticket</button>
+        </form>
+    </div>
 </header>
 
 <p class="aviso" th:if="${mensaje}" th:text="${mensaje}">Sincronización completada</p>
 <p class="error" th:if="${mensajeError}" th:text="${mensajeError}">Falló</p>
 <p class="error" th:if="${error}" th:text="${error}">Error</p>
 
-<table th:if="${error == null}">
+<p class="error" th:if="${error == null and ticket != null and #lists.isEmpty(inconsistencias)}"
+   th:text="'No existe el ticket ' + ${ticket} + '.'">No existe</p>
+
+<section class="resumen" th:if="${resumen != null and not #lists.isEmpty(resumen)}">
+    <h2>Resumen de candidatos</h2>
+    <p>Elige un ticket de ejemplo de cada grupo y prueba con <em>Sincronizar este ticket</em>
+        antes de sincronizar todo.</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Motivo</th>
+            <th>Tickets</th>
+            <th>¿Se corrige?</th>
+            <th>Ejemplos para probar</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="g : ${resumen}">
+            <td th:text="${g.motivo}">Vice vacío</td>
+            <td class="centro" th:text="${g.cantidad}">10</td>
+            <td class="centro" th:classappend="${g.corregible} ? 'ok' : 'mal'"
+                th:text="${g.corregible} ? 'Sí' : 'No'">Sí</td>
+            <td>
+                <a th:each="t : ${g.ejemplos}" class="ejemplo"
+                   th:href="@{/inconsistencias(ticket=${t})}" th:text="${t}">164738</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</section>
+
+<table th:if="${error == null and not #lists.isEmpty(inconsistencias)}">
     <thead>
     <tr>
         <th>N.º</th>
@@ -34,6 +88,8 @@
         <th>Cía</th>
         <th>AD-Vice</th>
         <th>AD-Cía</th>
+        <th>Motivo</th>
+        <th>¿Se corrige?</th>
     </tr>
     </thead>
     <tbody>
@@ -46,10 +102,15 @@
         <td><a target="_blank" rel="noopener"
                th:href="@{${servicedeskUrl} + '/ESM.do'(type='users', viewType='details', userId=${i.userId})}"
                th:text="${i.solicitante}">Nombre</a></td>
-        <td class="centro" th:text="${i.vice}">N/D</td>
-        <td class="centro" th:text="${i.cia}">N/D</td>
-        <td class="centro" th:text="${i.adVice}">N/D</td>
-        <td class="centro" th:text="${i.adCia}">N/D</td>
+        <td class="centro" th:text="${i.viceTexto()}">N/D</td>
+        <td class="centro" th:text="${i.ciaTexto()}">N/D</td>
+        <td class="centro" th:text="${i.adViceTexto()}">N/D</td>
+        <td class="centro" th:text="${i.adCiaTexto()}">N/D</td>
+        <td th:classappend="${i.sincronizado()} ? 'ok'" th:text="${i.motivo()}">Vice vacío</td>
+        <td class="centro" th:if="${i.sincronizado()}">—</td>
+        <td class="centro" th:unless="${i.sincronizado()}"
+            th:classappend="${i.corregible()} ? 'ok' : 'mal'"
+            th:text="${i.corregible()} ? 'Sí' : 'No'">Sí</td>
     </tr>
     </tbody>
 </table>

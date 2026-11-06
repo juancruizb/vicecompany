@@ -29,14 +29,11 @@ a:hover {
     z-index: 2;
     background: var(--fondo);
     padding: 12px 16px;
-    text-align: center;
-}
-
-.barra a {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .barra h1 {
@@ -44,14 +41,27 @@ a:hover {
     font-size: 1.4rem;
 }
 
-.barra form {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
+.acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-.barra button {
+.acciones form {
+    display: flex;
+    gap: 6px;
+}
+
+.acciones input {
+    width: 130px;
+    background: var(--tabla);
+    color: var(--texto);
+    border: 1px solid var(--encabezado);
+    border-radius: 4px;
+    padding: 6px 8px;
+}
+
+.acciones button {
     background: var(--tabla);
     color: #e7ab0c;
     border: 1px solid #e7ab0c;
@@ -60,8 +70,18 @@ a:hover {
     cursor: pointer;
 }
 
-.barra button:hover {
+.acciones button:hover {
     background: #e7ab0c;
+    color: var(--fondo);
+}
+
+.acciones button.peligro {
+    color: #ff8a80;
+    border-color: #ff8a80;
+}
+
+.acciones button.peligro:hover {
+    background: #ff8a80;
     color: var(--fondo);
 }
 
@@ -92,7 +112,7 @@ table {
 
 th {
     position: sticky;
-    top: 52px; /* debajo de la barra */
+    top: 58px; /* debajo de la barra */
     background: var(--encabezado);
     padding: 10px;
 }
@@ -107,4 +127,42 @@ tbody tr:hover {
 
 .centro {
     text-align: center;
+}
+
+.ok {
+    color: #7ee2a0;
+    font-weight: bold;
+}
+
+.mal {
+    color: #ff8a80;
+    font-weight: bold;
+}
+
+.resumen {
+    width: calc(100% - 32px);
+    max-width: 1500px;
+    margin: 0 auto 24px;
+}
+
+.resumen h2 {
+    margin: 8px 0;
+    font-size: 1.1rem;
+}
+
+.resumen p {
+    margin: 0 0 8px;
+    color: #c8c8d0;
+}
+
+.resumen table {
+    width: 100%;
+}
+
+.resumen th {
+    position: static;
+}
+
+.ejemplo {
+    margin-right: 12px;
 }

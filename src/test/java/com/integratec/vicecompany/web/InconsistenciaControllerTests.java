@@ -11,8 +11,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,14 +42,54 @@ class InconsistenciaControllerTests {
     @Test
     void muestraLasInconsistencias() throws Exception {
         given(repository.buscarTodas()).willReturn(List.of(
-                new Inconsistencia(164738L, 42L, "06 Nov 2026", "Maria Prueba",
-                        "N/D", "N/D", "VICEPRESIDENCIA TECNOLOGIA", "Seguros Universal")));
+                new Inconsistencia(164738L, 42L, "06 Nov 2026", "Maria Prueba", true,
+                        null, null, "VICEPRESIDENCIA TECNOLOGIA", "Seguros Universal")));
 
         mvc.perform(get("/inconsistencias"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("1 inconsistencias encontradas")))
                 .andExpect(content().string(containsString("woID=164738")))
-                .andExpect(content().string(containsString("VICEPRESIDENCIA TECNOLOGIA")));
+                .andExpect(content().string(containsString("VICEPRESIDENCIA TECNOLOGIA")))
+                .andExpect(content().string(containsString("Resumen de candidatos")))
+                .andExpect(content().string(containsString("Vice vacío; Cía vacío")))
+                .andExpect(content().string(containsString("Sincronizar todo")));
+    }
+
+    @Test
+    void verUnTicketMuestraSoloEseYNoOfreceElLote() throws Exception {
+        given(repository.buscarTicket(164738L)).willReturn(Optional.of(
+                new Inconsistencia(164738L, 42L, "06 Nov 2026", "Maria Prueba", true,
+                        null, null, "VICEPRESIDENCIA TECNOLOGIA", "Seguros Universal")));
+
+        mvc.perform(get("/inconsistencias").param("ticket", "164738"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Ticket 164738")))
+                .andExpect(content().string(containsString("Sincronizar este ticket")))
+                .andExpect(content().string(not(containsString("Sincronizar todo"))));
+
+        then(repository).should(never()).buscarTodas();
+    }
+
+    @Test
+    void ticketInexistente() throws Exception {
+        given(repository.buscarTicket(999L)).willReturn(Optional.empty());
+
+        mvc.perform(get("/inconsistencias").param("ticket", "999"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("No existe el ticket 999")))
+                .andExpect(content().string(not(containsString("Sincronizar este ticket"))));
+    }
+
+    @Test
+    void sincronizarUnTicketNoTocaLosDemas() throws Exception {
+        given(repository.sincronizarTicket(164738L)).willReturn(new ResultadoSincronizacion(1, 1));
+
+        mvc.perform(post("/inconsistencias/sincronizar").param("ticket", "164738").with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/inconsistencias?ticket=164738"))
+                .andExpect(flash().attribute("mensaje", containsString("1 tickets con Vice y 1 con Cía")));
+
+        then(repository).should(never()).sincronizar();
     }
 
     @Test
@@ -60,7 +102,7 @@ class InconsistenciaControllerTests {
     }
 
     @Test
-    void sincronizarActualizaYRedirige() throws Exception {
+    void sincronizarTodoActualizaYRedirige() throws Exception {
         given(repository.sincronizar()).willReturn(new ResultadoSincronizacion(3, 2));
 
         mvc.perform(post("/inconsistencias/sincronizar").with(csrf()))

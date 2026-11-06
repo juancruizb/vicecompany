@@ -97,6 +97,16 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
   plantilla en `application-local.properties.example`.
 - Pruebas: `InconsistenciaControllerTests` (5 casos, base simulada con `@MockitoBean`).
 - **Aún no se probó contra la base real.**
+- Para probar antes del lote:
+  - `/inconsistencias?ticket=N` (o el buscador) muestra un ticket, esté bien o no, con su
+    motivo; el botón **Sincronizar este ticket** aplica el mismo `UPDATE` solo a ese ticket.
+    En esa vista no aparece "Sincronizar todo".
+  - Columnas **Motivo** y **¿Se corrige?** en cada fila, y un **Resumen de candidatos**
+    arriba: cantidad de tickets por motivo y 3 tickets de ejemplo por grupo para probar.
+  - Motivos: campo vacío (`NULL`, `''`, `(null)`), con relleno (`vicepresidencia`/`company`),
+    distinto del AD; "sin dato en AD" si el usuario no tiene un valor real; "Ticket sin
+    campos adicionales" si no hay fila en `Request_Additional_Fields_1` (el `UPDATE` no la crea).
+  - Pruebas: `InconsistenciaTests` (10 casos de motivos y resumen) y 8 del controlador.
 
 ## Conceptos aprendidos
 
@@ -171,8 +181,11 @@ historial de Git. Para retomar una conversación completa: `claude --continue` o
 ## Pendiente / próximos pasos
 
 - [ ] Probar `/inconsistencias` contra la base real: copiar
-  `application-local.properties.example` como `application-local.properties`, completar, y
-  primero solo mirar la lista antes de pulsar Sincronizar.
+  `application-local.properties.example` como `application-local.properties` y completar.
+  Revisar el resumen de candidatos, sincronizar un ticket de ejemplo de cada grupo
+  corregible y comprobarlo en ServiceDesk Plus. Solo después, "Sincronizar todo".
+- [ ] Decidir qué hacer con los tickets que no se corrigen (usuario sin Vice/Cía real en el
+  AD, o ticket sin fila de campos adicionales).
 - [ ] Crear en SQL Server un usuario para ViceCompany (no `sa`): lectura en las tablas de la
   consulta y `UPDATE` solo en `Request_Additional_Fields_1`.
 - [ ] Decidir si la sincronización debe correr sola (`@Scheduled`) además del botón.
