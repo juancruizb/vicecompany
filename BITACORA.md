@@ -157,6 +157,9 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
   tomada del atributo del usuario (AD-Cía), y el ticket quedó "Sincronizado". La Vice, que
   ya coincidía, no se tocó.
 - Queda validado el `UPDATE` por ticket en producción.
+- Al terminar se dejó todo como estaba: `vice.sincronizacion.habilitada=false`, ViceCompany
+  detenido y el JSP abierto de nuevo (sigue sincronizando los tickets nuevos). En el servidor
+  queda `F:\ViceCompany\despliegue` listo para volver a usarse.
 
 ## Conceptos aprendidos
 
@@ -236,10 +239,9 @@ historial de Git. Para retomar una conversación completa: `claude --continue` o
   reporte por usuario (no por ticket) para corregirlos en el origen.
 - [ ] Mientras el JSP esté cerrado, los tickets nuevos no se sincronizan: reabrirlo o activar
   ViceCompany cuando termine la prueba 2.
-- [x] Prueba 2 (un ticket 164830): exitosa el 2026-11-06. Falta confirmarlo en la interfaz
-  de ServiceDesk Plus y volver a `vice.sincronizacion.habilitada=false`.
-- [ ] Decidir quién sincroniza los tickets nuevos: volver a abrir el JSP, o reemplazarlo con
-  ViceCompany (botón "Sincronizar todo" o una tarea `@Scheduled` cada hora).
+- [x] Prueba 2 (un ticket 164830): exitosa el 2026-11-06; servidor restaurado.
+- [ ] Siguiente paso propuesto: reemplazar el JSP con una tarea `@Scheduled` en ViceCompany
+  (sincronizar cada hora sin página abierta) y correrlo como servicio de Windows.
 - [ ] Guardar en el repositorio una plantilla de `iniciar.bat` (sin credenciales).
 - [ ] Ajuste visual: el encabezado fijo de la tabla tapa parte de la fila de arriba.
 - [ ] Crear en SQL Server un usuario para ViceCompany (no `sa`): lectura en las tablas de la
