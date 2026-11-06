@@ -147,6 +147,17 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
 - Se cerró el JSP para que no actualice. Plan: esperar tickets nuevos de usuarios con datos
   en el AD (aparecerán como "¿Se corrige? Sí") y usar uno para la prueba 2.
 
+### 2026-11-06 (noche) — Prueba 2 en el servidor (un ticket): exitosa
+
+- Para tener un candidato se borró a propósito la Cía del ticket **164830** (solicitante con
+  Vice y Cía reales en el AD). Apareció en el resumen como "Cía vacío — ¿Se corrige? Sí";
+  total 5483.
+- Con `vice.sincronizacion.habilitada=true` se pulsó "Sincronizar este ticket":
+  **"0 tickets con Vice y 1 con Cía actualizados"**. La Cía volvió a "Seguros Universal",
+  tomada del atributo del usuario (AD-Cía), y el ticket quedó "Sincronizado". La Vice, que
+  ya coincidía, no se tocó.
+- Queda validado el `UPDATE` por ticket en producción.
+
 ## Conceptos aprendidos
 
 **Refactorizar**: cambiar cómo está escrito u organizado el código sin cambiar lo que hace.
@@ -225,9 +236,12 @@ historial de Git. Para retomar una conversación completa: `claude --continue` o
   reporte por usuario (no por ticket) para corregirlos en el origen.
 - [ ] Mientras el JSP esté cerrado, los tickets nuevos no se sincronizan: reabrirlo o activar
   ViceCompany cuando termine la prueba 2.
-- [ ] Prueba 2 (un ticket): elegir un candidato, poner `vice.sincronizacion.habilitada=true`,
-  sincronizar solo ese ticket, comprobarlo en ServiceDesk Plus y volver a `false`.
-  Solo después, "Sincronizar todo".
+- [x] Prueba 2 (un ticket 164830): exitosa el 2026-11-06. Falta confirmarlo en la interfaz
+  de ServiceDesk Plus y volver a `vice.sincronizacion.habilitada=false`.
+- [ ] Decidir quién sincroniza los tickets nuevos: volver a abrir el JSP, o reemplazarlo con
+  ViceCompany (botón "Sincronizar todo" o una tarea `@Scheduled` cada hora).
+- [ ] Guardar en el repositorio una plantilla de `iniciar.bat` (sin credenciales).
+- [ ] Ajuste visual: el encabezado fijo de la tabla tapa parte de la fila de arriba.
 - [ ] Crear en SQL Server un usuario para ViceCompany (no `sa`): lectura en las tablas de la
   consulta y `UPDATE` solo en `Request_Additional_Fields_1`.
 - [ ] Decidir si la sincronización debe correr sola (`@Scheduled`) además del botón.
