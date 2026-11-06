@@ -123,6 +123,30 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
   Adoptium); `iniciar.bat` lo descomprime la primera vez en `jdk\` y lo usa solo para
   ViceCompany, sin tocar el PATH ni el Java del sistema. Memoria limitada con `-Xmx512m`.
 
+### 2026-11-06 (noche) — Prueba 1 en el servidor (solo lectura): resultado
+
+- ViceCompany corrió en el servidor (`F:\ViceCompany\despliegue`, Java 21 portable, puerto
+  8090). El primer `iniciar.bat` falló al renombrar `jdk-21...` a `jdk` ("Access is denied",
+  probablemente el antivirus revisando los archivos); se corrigió el `.bat` para no renombrar.
+- Conectó a la base y mostró **5482 inconsistencias, igual que el JSP** en ese momento.
+- Resumen de candidatos (suma 5482):
+
+  | Motivo | Tickets |
+  |---|---|
+  | Vice vacío (sin dato en AD); Cía vacío (sin dato en AD) | 2217 |
+  | Vice y Cía con valor de relleno (sin dato en AD) | 1913 |
+  | Vice vacío (sin dato en AD) | 952 |
+  | Cía vacío (sin dato en AD) | 361 |
+  | Cía con valor de relleno (sin dato en AD) | 18 |
+  | Vice vacío y Cía con relleno (sin dato en AD) | 16 |
+  | Ticket sin campos adicionales | 5 |
+
+- **Conclusión: ninguno es corregible.** No hay ningún caso "distinto del AD": el JSP ya
+  mantenía sincronizado todo lo que tenía dato. Las 5482 son de usuarios sin Vice/Cía real en
+  `UserAdditionalFields` (problema de datos del AD/importación de usuarios, no del ticket).
+- Se cerró el JSP para que no actualice. Plan: esperar tickets nuevos de usuarios con datos
+  en el AD (aparecerán como "¿Se corrige? Sí") y usar uno para la prueba 2.
+
 ## Conceptos aprendidos
 
 **Refactorizar**: cambiar cómo está escrito u organizado el código sin cambiar lo que hace.
@@ -195,14 +219,15 @@ historial de Git. Para retomar una conversación completa: `claude --continue` o
 
 ## Pendiente / próximos pasos
 
-- [ ] Prueba 1 (solo lectura): copiar `despliegue/` al servidor por RDP, ejecutar
-  `iniciar.bat`, abrir http://localhost:8090/inconsistencias y validar el resumen de
-  candidatos.
+- [x] Prueba 1 (solo lectura): hecha el 2026-11-06, ver historial.
+- [ ] Investigar por qué 4000+ usuarios no tienen Vice/Cía real en `UserAdditionalFields`
+  (¿faltan en el AD o la importación de usuarios de ServiceDesk no los trae?). Posible
+  reporte por usuario (no por ticket) para corregirlos en el origen.
+- [ ] Mientras el JSP esté cerrado, los tickets nuevos no se sincronizan: reabrirlo o activar
+  ViceCompany cuando termine la prueba 2.
 - [ ] Prueba 2 (un ticket): elegir un candidato, poner `vice.sincronizacion.habilitada=true`,
   sincronizar solo ese ticket, comprobarlo en ServiceDesk Plus y volver a `false`.
   Solo después, "Sincronizar todo".
-- [ ] Decidir qué hacer con los tickets que no se corrigen (usuario sin Vice/Cía real en el
-  AD, o ticket sin fila de campos adicionales).
 - [ ] Crear en SQL Server un usuario para ViceCompany (no `sa`): lectura en las tablas de la
   consulta y `UPDATE` solo en `Request_Additional_Fields_1`.
 - [ ] Decidir si la sincronización debe correr sola (`@Scheduled`) además del botón.
