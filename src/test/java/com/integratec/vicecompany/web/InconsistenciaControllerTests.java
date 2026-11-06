@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.integratec.vicecompany.inconsistencias.Inconsistencia;
 import com.integratec.vicecompany.inconsistencias.InconsistenciaRepository;
+import com.integratec.vicecompany.inconsistencias.SincronizacionAutomatica;
 import com.integratec.vicecompany.inconsistencias.InconsistenciaRepository.ResultadoSincronizacion;
 
 /** Prueba la página sin base de datos real: el repositorio se reemplaza por un mock. */
@@ -39,6 +41,9 @@ class InconsistenciaControllerTests {
 
     @MockitoBean
     private InconsistenciaRepository repository;
+
+    @MockitoBean
+    private SincronizacionAutomatica automatica;
 
     @Test
     void muestraLasInconsistencias() throws Exception {
@@ -91,6 +96,21 @@ class InconsistenciaControllerTests {
                 .andExpect(flash().attribute("mensaje", containsString("1 tickets con Vice y 1 con Cía")));
 
         then(repository).should(never()).sincronizar();
+    }
+
+    @Test
+    void muestraElEstadoDeLaSincronizacionAutomatica() throws Exception {
+        given(repository.buscarTodas()).willReturn(List.of());
+        given(automatica.activa()).willReturn(true);
+        given(automatica.cron()).willReturn("0 0 * * * *");
+        given(automatica.ultima()).willReturn(Optional.of(new SincronizacionAutomatica.Ejecucion(
+                LocalDateTime.of(2026, 11, 6, 19, 0), true, "0 tickets con Vice y 2 con Cía actualizados")));
+
+        mvc.perform(get("/inconsistencias"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Sincronización automática activa")))
+                .andExpect(content().string(containsString("06/11/2026 19:00")))
+                .andExpect(content().string(containsString("0 tickets con Vice y 2 con Cía actualizados")));
     }
 
     @Test

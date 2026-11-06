@@ -11,3 +11,9 @@ vice.servicedesk.url=https://HOST_SERVICEDESK
 
 # false = solo lectura (recomendado para la primera prueba).
 vice.sincronizacion.habilitada=false
+
+# Sincronización automática: "-" = apagada; "0 0 * * * *" = cada hora en punto.
+vice.sincronizacion.cron=-
+
+# Log en archivo (útil cuando corre como servicio, sin ventana).
+logging.file.name=logs/vicecompany.log

@@ -24,9 +24,6 @@ a:hover {
 }
 
 .barra {
-    position: sticky;
-    top: 0;
-    z-index: 2;
     background: var(--fondo);
     padding: 12px 16px;
     display: flex;
@@ -112,7 +109,8 @@ table {
 
 th {
     position: sticky;
-    top: 58px; /* debajo de la barra */
+    top: 0;
+    z-index: 1;
     background: var(--encabezado);
     padding: 10px;
 }
@@ -175,4 +173,13 @@ tbody tr:hover {
     border-left: 4px solid #e7ab0c;
     background: var(--tabla);
     color: #e7ab0c;
+}
+
+.automatica {
+    width: calc(100% - 32px);
+    max-width: 1500px;
+    margin: 0 auto 12px;
+    padding: 8px 12px;
+    border-left: 4px solid #7ee2a0;
+    background: var(--tabla);
 }

@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.integratec.vicecompany.inconsistencias.InconsistenciaRepository;
 import com.integratec.vicecompany.inconsistencias.InconsistenciaRepository.ResultadoSincronizacion;
 import com.integratec.vicecompany.inconsistencias.ResumenCandidatos;
+import com.integratec.vicecompany.inconsistencias.SincronizacionAutomatica;
 
 @Controller
 public class InconsistenciaController {
@@ -23,13 +24,16 @@ public class InconsistenciaController {
     private static final Logger log = LoggerFactory.getLogger(InconsistenciaController.class);
 
     private final InconsistenciaRepository repository;
+    private final SincronizacionAutomatica automatica;
     private final String servicedeskUrl;
     private final boolean sincronizacionHabilitada;
 
     public InconsistenciaController(InconsistenciaRepository repository,
+                                    SincronizacionAutomatica automatica,
                                     @Value("${vice.servicedesk.url}") String servicedeskUrl,
                                     @Value("${vice.sincronizacion.habilitada:false}") boolean sincronizacionHabilitada) {
         this.repository = repository;
+        this.automatica = automatica;
         this.servicedeskUrl = servicedeskUrl;
         this.sincronizacionHabilitada = sincronizacionHabilitada;
     }
@@ -43,6 +47,7 @@ public class InconsistenciaController {
         model.addAttribute("servicedeskUrl", servicedeskUrl);
         model.addAttribute("ticket", ticket);
         model.addAttribute("sincronizacionHabilitada", sincronizacionHabilitada);
+        model.addAttribute("automatica", automatica);
         try {
             if (ticket == null) {
                 var todas = repository.buscarTodas();

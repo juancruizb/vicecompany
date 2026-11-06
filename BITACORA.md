@@ -165,6 +165,23 @@ JSP/Servlets existente (corre sobre Tomcat, desarrollada en Eclipse).
   detenido y el JSP abierto de nuevo (sigue sincronizando los tickets nuevos). En el servidor
   queda `F:\ViceCompany\despliegue` listo para volver a usarse.
 
+### 2026-11-06 (noche) — Tarea programada para reemplazar el JSP
+
+- `SincronizacionAutomatica` con `@Scheduled(cron = "${vice.sincronizacion.cron}")` hace lo
+  mismo que "Sincronizar todo", sin página abierta. `SchedulingConfig` activa `@EnableScheduling`.
+- Dos llaves: `vice.sincronizacion.cron` (`-` = apagada, por defecto; `0 0 * * * *` = cada hora
+  en punto, como el JSP) y `vice.sincronizacion.habilitada` (si es `false`, la tarea corre
+  pero no escribe y lo deja en el log).
+- La página muestra si está activa y el resultado de la última ejecución.
+- Log en archivo con `logging.file.name=logs/vicecompany.log` (para cuando corra sin ventana).
+- Se probó el jar con un cron cada 5 segundos: se dispara a tiempo y en solo lectura no escribe.
+- Pruebas: 27 (4 nuevas de la tarea, 1 del aviso en la página).
+- Se corrigió el encabezado fijo que tapaba filas: ahora solo el encabezado de la tabla es fijo.
+- `scripts/iniciar.bat` (plantilla sin credenciales) en el repositorio; `.gitattributes`
+  mantiene los `.bat` con CRLF.
+- `despliegue/` actualizado: jar nuevo y `application-local.properties` con cron horario y log
+  en archivo (escritura aún en `false`).
+
 ## Conceptos aprendidos
 
 **Refactorizar**: cambiar cómo está escrito u organizado el código sin cambiar lo que hace.
@@ -228,6 +245,10 @@ JPA porque la base es de otro producto y las consultas ya existían.
 recargar la página no repita la acción. Los "flash attributes" sobreviven a esa redirección,
 como `messages.success()` en Django.
 
+**`@Scheduled` y cron**: Spring ejecuta el método según un cron de 6 campos
+(segundo minuto hora día mes día-semana), como Celery beat o un crontab en Django. `-` lo
+desactiva. `@EnableScheduling` activa el mecanismo.
+
 **`@MockitoBean`**: en una prueba, reemplaza un bean real (el repositorio) por uno simulado,
 para probar el controlador sin base de datos.
 
@@ -244,10 +265,10 @@ historial de Git. Para retomar una conversación completa: `claude --continue` o
 - [ ] Mientras el JSP esté cerrado, los tickets nuevos no se sincronizan: reabrirlo o activar
   ViceCompany cuando termine la prueba 2.
 - [x] Prueba 2 (un ticket 164830): exitosa el 2026-11-06; servidor restaurado.
-- [ ] Siguiente paso propuesto: reemplazar el JSP con una tarea `@Scheduled` en ViceCompany
-  (sincronizar cada hora sin página abierta) y correrlo como servicio de Windows.
-- [ ] Guardar en el repositorio una plantilla de `iniciar.bat` (sin credenciales).
-- [ ] Ajuste visual: el encabezado fijo de la tabla tapa parte de la fila de arriba.
+- [ ] Poner en marcha la tarea en el servidor: copiar `vicecompany.jar` y
+  `application-local.properties` nuevos, poner `vice.sincronizacion.habilitada=true`, cerrar
+  el JSP y verificar en `logs/vicecompany.log` la ejecución de la hora en punto.
+- [ ] Correr ViceCompany como servicio de Windows (que arranque solo con el servidor).
 - [ ] Crear en SQL Server un usuario para ViceCompany (no `sa`): lectura en las tablas de la
   consulta y `UPDATE` solo en `Request_Additional_Fields_1`.
 - [ ] Decidir si la sincronización debe correr sola (`@Scheduled`) además del botón.

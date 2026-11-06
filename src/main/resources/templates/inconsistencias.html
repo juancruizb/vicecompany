@@ -43,6 +43,14 @@
 </header>
 
 <p class="lectura" th:unless="${sincronizacionHabilitada}">Modo solo lectura: no se modifica ningún ticket.</p>
+<p class="automatica" th:if="${automatica.activa()}">
+    Sincronización automática activa (cron <code th:text="${automatica.cron()}">0 0 * * * *</code>).
+    <span th:if="${automatica.ultima().isPresent()}"
+          th:with="e=${automatica.ultima().get()}"
+          th:classappend="${e.exitosa()} ? 'ok' : 'mal'"
+          th:text="'Última: ' + ${#temporals.format(e.cuando(), 'dd/MM/yyyy HH:mm')} + ' — ' + ${e.resultado()}">Última</span>
+    <span th:unless="${automatica.ultima().isPresent()}">Todavía no se ha ejecutado.</span>
+</p>
 <p class="aviso" th:if="${mensaje}" th:text="${mensaje}">Sincronización completada</p>
 <p class="error" th:if="${mensajeError}" th:text="${mensajeError}">Falló</p>
 <p class="error" th:if="${error}" th:text="${error}">Error</p>

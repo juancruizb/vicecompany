@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.integratec.vicecompany.inconsistencias.Inconsistencia;
 import com.integratec.vicecompany.inconsistencias.InconsistenciaRepository;
+import com.integratec.vicecompany.inconsistencias.SincronizacionAutomatica;
 
 /** Con vice.sincronizacion.habilitada=false nada puede escribir en la base. */
 @WebMvcTest(controllers = InconsistenciaController.class,
@@ -37,6 +38,9 @@ class InconsistenciaSoloLecturaTests {
 
     @MockitoBean
     private InconsistenciaRepository repository;
+
+    @MockitoBean
+    private SincronizacionAutomatica automatica;
 
     private static Inconsistencia ejemplo() {
         return new Inconsistencia(164738L, 42L, "06 Nov 2026", "Maria Prueba", true,
