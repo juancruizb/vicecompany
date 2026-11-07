@@ -41,3 +41,6 @@ bin/
 
 ### Paquete para copiar al servidor (incluye credenciales, nunca subir) ###
 /despliegue/
+
+# Notas personales de inglés (no se suben)
+/english-notes.md
