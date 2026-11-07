@@ -111,6 +111,7 @@ despliegue\
   vicecompany.jar                 ← ./mvnw package
   application-local.properties    ← credenciales y configuración
   iniciar.bat                     ← copia de scripts/iniciar.bat
+  LEEME.txt                       ← copia de scripts/LEEME.txt (guía de operación)
   jdk21.zip                       ← Temurin 21 para Windows x64 (adoptium.net)
 ```
 
@@ -121,6 +122,9 @@ despliegue\
 
 Al salir de una sesión RDP hay que **desconectarse, no cerrar sesión**: cerrar sesión detiene
 la aplicación. Pendiente: instalarla como servicio de Windows.
+
+Guía de operación para el servidor (arrancar, detener, modos y qué parámetro cambiar):
+[`scripts/LEEME.txt`](scripts/LEEME.txt). Se copia en la carpeta `despliegue`.
 
 ### Puesta en marcha recomendada
 

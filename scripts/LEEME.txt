@@ -1,0 +1,106 @@
+ViceCompany - Guía de operación en el servidor
+==============================================
+
+Sincroniza la Vicepresidencia y la Compañía de los tickets de ServiceDesk Plus con los
+datos del usuario en el AD. Reemplaza al JSP sync_vice_cia.jsp.
+
+Carpeta: F:\ViceCompany2\despliegue
+  vicecompany.jar                 la aplicación
+  application-local.properties    configuración y contraseña de la base (NO compartir)
+  iniciar.bat                     arranca la aplicación
+  jdk21.zip / jdk-21...\          Java 21 portable (no toca el Java 8 del servidor)
+  logs\vicecompany.log            registro de lo que hace
+  LEEME.txt                       esta guía
+
+
+1. ARRANCAR
+-----------
+  1. Comprobar que no hay otra copia corriendo (por ejemplo F:\ViceCompany\despliegue):
+     ambas usan el puerto 8090. Si la hay, detenerla primero (punto 2).
+  2. Doble clic en iniciar.bat.
+  3. Esperar a que la ventana diga "Started ViceCompanyApplication".
+  4. En el navegador del servidor: http://localhost:8090/login  (usuario operador)
+  5. Abrir "Inconsistencias" para ver el estado.
+
+  La ventana de iniciar.bat debe quedar ABIERTA: si se cierra, la aplicación se detiene.
+
+
+2. DETENER
+----------
+  - En la ventana de iniciar.bat: Ctrl+C (y responder S si pregunta), o cerrar la ventana.
+
+
+3. REINICIAR (necesario después de cambiar application-local.properties)
+------------------------------------------------------------------------
+  - Detener (punto 2) y arrancar otra vez (punto 1).
+  - Los cambios en application-local.properties NO se aplican hasta reiniciar.
+
+
+4. MODOS: QUÉ PARÁMETROS CAMBIAR
+--------------------------------
+  Se controla con dos líneas de application-local.properties (abrir con el Bloc de notas):
+
+    vice.sincronizacion.cron=...         ¿se ejecuta sola cada hora?   (ACTIVA / INACTIVA)
+    vice.sincronizacion.habilitada=...   ¿puede escribir en la base?   (ACTUALIZA / SOLO LECTURA)
+
+  cron = 0 0 * * * *   -> ACTIVA: se ejecuta sola cada hora en punto.
+  cron = -             -> INACTIVA: no se ejecuta sola.
+  habilitada = true    -> ACTUALIZA: puede modificar Vice/Cía de los tickets.
+  habilitada = false   -> SOLO LECTURA: nunca escribe en la base.
+
+  Combinaciones:
+
+  | cron        | habilitada | Modo                    | Qué hace                                   |
+  |-------------|------------|-------------------------|--------------------------------------------|
+  | 0 0 * * * * | true       | PRODUCCIÓN              | Sincroniza sola cada hora. Reemplaza al    |
+  |             |            |                         | JSP: el JSP debe estar CERRADO.            |
+  | 0 0 * * * * | false      | PRUEBA DEL AUTOMÁTICO   | Se ejecuta cada hora pero no escribe:      |
+  |             |            |                         | "Omitida: modo solo lectura".              |
+  | -           | true       | MANUAL                  | No se ejecuta sola. La página muestra los  |
+  |             |            |                         | botones "Sincronizar" para hacerlo a mano. |
+  | -           | false      | SOLO CONSULTA           | Solo muestra la lista. Nada escribe.       |
+
+  Cómo se ve en la página /inconsistencias:
+    - "Sincronización automática activa" -> el cron está activo.
+    - Botones "Sincronizar ..." visibles -> habilitada=true (puede escribir).
+    - Sin botones                        -> habilitada=false (solo lectura).
+    - "Última: fecha hora — resultado"   -> resultado de la última hora en punto.
+
+  Otros parámetros (normalmente no se tocan):
+    server.port=8090                 puerto de la página
+    server.address=127.0.0.1         solo se abre desde el propio servidor
+    spring.datasource.username=...   usuario de la base: vicecompany (nunca sa)
+    spring.datasource.password=...   su contraseña
+    logging.file.name=logs/vicecompany.log
+
+
+5. REGLAS IMPORTANTES
+---------------------
+  - Solo UNO sincroniza: o el JSP o ViceCompany en modo PRODUCCIÓN, nunca los dos.
+  - Solo una copia de ViceCompany a la vez (puerto 8090).
+  - Al salir de la sesión RDP: DESCONECTAR, no "cerrar sesión" (cerrar sesión la detiene).
+  - Si el servidor se reinicia, ViceCompany NO arranca sola: hay que ejecutar iniciar.bat
+    (pendiente: instalarla como servicio de Windows).
+  - Para probar un cambio de escritura: primero un ticket
+    (http://localhost:8090/inconsistencias?ticket=N, botón "Sincronizar este ticket"),
+    después el lote.
+
+
+6. REVISAR QUE FUNCIONA
+-----------------------
+  - Página /inconsistencias: estado y "Última: ...".
+  - logs\vicecompany.log, a cada hora en punto debe aparecer una de estas líneas:
+      "Sincronización automática: ..."                    -> se ejecutó (PRODUCCIÓN)
+      "Sincronización automática omitida: modo solo lectura" -> PRUEBA DEL AUTOMÁTICO
+      "Falló la sincronización automática; no se modificó ningún ticket" -> error: revisar
+       las líneas siguientes del log. La transacción se deshace, no deja datos a medias.
+  - Al arrancar, el log dice "Sincronización automática activa (cron ..., escritura ...)".
+  - Si aparece "permission was denied": al usuario vicecompany le falta un permiso
+    (ver scripts/create-sql-user.sql en el repositorio).
+
+
+7. VOLVER ATRÁS (si algo no se ve bien)
+---------------------------------------
+  1. Detener ViceCompany (punto 2).
+  2. Abrir otra vez el JSP sync_vice_cia.jsp para que vuelva a sincronizar.
+  Todo queda como antes: ViceCompany no cambia la estructura de la base.
