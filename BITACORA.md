@@ -249,6 +249,19 @@ Actualizado: 2026-11-07. Todo el código está en GitHub (`main`) y las 27 prueb
 - Se agregó a esta bitácora la sección "Dónde quedamos (para retomar)" con el paso a paso
   del día siguiente. Sin cambios de código.
 
+### 2026-11-07 — Riesgos y usuario SQL propio
+
+- Se acordó responder en el idioma de cada pregunta (español o inglés); actualizado `CLAUDE.md`.
+- Se revisaron los riesgos de reemplazar el JSP en un servidor crítico. El mayor: escribir en
+  producción con `sa`. Otros: un lote grande (si se corrige el AD y aparecen miles de
+  candidatos) podría bloquear la tabla un momento; no correr el JSP y ViceCompany a la vez; el
+  futuro servicio de Windows no debe correr como LocalSystem. Plan de vuelta atrás: detener
+  ViceCompany y abrir el JSP otra vez (no cambia la estructura de la base).
+- `scripts/crear-usuario-sql.sql`: crea el login `vicecompany` con permisos por columna:
+  `SELECT` solo en las columnas que usan las consultas y `UPDATE` solo en `UDF_CHAR20` y
+  `UDF_CHAR19` de `Request_Additional_Fields_1`. Incluye verificación y cómo eliminarlo.
+  La contraseña se escribe en el servidor, no en el repositorio.
+
 ## Conceptos aprendidos
 
 **Refactorizar**: cambiar cómo está escrito u organizado el código sin cambiar lo que hace.
@@ -336,8 +349,8 @@ historial de Git. Para retomar una conversación completa: `claude --continue` o
 
 **Seguridad**
 
-- [ ] Crear en SQL Server un usuario para ViceCompany (no `sa`): lectura en las tablas de la
-  consulta y `UPDATE` solo en `Request_Additional_Fields_1`.
+- [ ] Crear en SQL Server un usuario para ViceCompany (no `sa`): script listo en
+  `scripts/crear-usuario-sql.sql` (falta ejecutarlo en el servidor y cambiar las propiedades).
 - [ ] Sacar la contraseña de `application-local.properties` (variable de entorno o similar).
 - [ ] Borrar en el servidor `F:\ViceCompany\referencia` y lo demás del proyecto que no sea
   `despliegue` (tiene la contraseña de `sa` y un token de API).
