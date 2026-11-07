@@ -257,7 +257,7 @@ Actualizado: 2026-11-07. Todo el código está en GitHub (`main`) y las 27 prueb
   candidatos) podría bloquear la tabla un momento; no correr el JSP y ViceCompany a la vez; el
   futuro servicio de Windows no debe correr como LocalSystem. Plan de vuelta atrás: detener
   ViceCompany y abrir el JSP otra vez (no cambia la estructura de la base).
-- `scripts/crear-usuario-sql.sql`: crea el login `vicecompany` con permisos por columna:
+- `scripts/create-sql-user.sql`: crea el login `vicecompany` con permisos por columna:
   `SELECT` solo en las columnas que usan las consultas y `UPDATE` solo en `UDF_CHAR20` y
   `UDF_CHAR19` de `Request_Additional_Fields_1`. Incluye verificación y cómo eliminarlo.
   La contraseña se escribe en el servidor, no en el repositorio.
@@ -350,7 +350,7 @@ historial de Git. Para retomar una conversación completa: `claude --continue` o
 **Seguridad**
 
 - [ ] Crear en SQL Server un usuario para ViceCompany (no `sa`): script listo en
-  `scripts/crear-usuario-sql.sql` (falta ejecutarlo en el servidor y cambiar las propiedades).
+  `scripts/create-sql-user.sql` (falta ejecutarlo en el servidor y cambiar las propiedades).
 - [ ] Sacar la contraseña de `application-local.properties` (variable de entorno o similar).
 - [ ] Borrar en el servidor `F:\ViceCompany\referencia` y lo demás del proyecto que no sea
   `despliegue` (tiene la contraseña de `sa` y un token de API).
