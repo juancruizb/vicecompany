@@ -54,6 +54,39 @@ donde se ejecuta la aplicación. Ese archivo **no se sube a Git**. Hay una plant
 | `logging.file.name` | sin archivo | Log en archivo, por ejemplo `logs/vicecompany.log` |
 | `server.port` / `server.address` | `8080` / todas | En el servidor: `8090` y `127.0.0.1` |
 
+### Usuario de base de datos
+
+La aplicación **no debe usar `sa`**. El script
+[`scripts/create-sql-user.sql`](scripts/create-sql-user.sql) crea el login `vicecompany` con
+el mínimo de permisos:
+
+| Permiso | Tabla | Columnas |
+|---|---|---|
+| `SELECT` | `WorkOrder` | `WORKORDERID`, `REQUESTERID`, `CREATEDTIME` |
+| `SELECT` | `SDUser` | `USERID` |
+| `SELECT` | `AaaUser` | `USER_ID`, `FIRST_NAME` |
+| `SELECT` | `UserAdditionalFields` | `INSTANCE_ID`, `UDF_CHAR2`, `UDF_CHAR1` |
+| `SELECT` | `Request_Additional_Fields_1` | `WORKORDERID`, `UDF_CHAR20`, `UDF_CHAR19` |
+| `UPDATE` | `Request_Additional_Fields_1` | `UDF_CHAR20` (Vice), `UDF_CHAR19` (Cía) |
+
+No puede borrar, insertar, cambiar la estructura ni leer otras tablas o columnas.
+
+1. En el servidor, con SQL Server Management Studio y un usuario administrador, abrir el
+   script, cambiar `CAMBIAR_CONTRASENA` por una contraseña fuerte (sin guardar el archivo) y
+   ejecutarlo.
+2. Ejecutar la sección "Verificación": debe listar 5 permisos `SELECT` y 1 `UPDATE`; la
+   prueba como `vicecompany` funciona en las columnas permitidas y falla con `SELECT *`.
+3. En `application-local.properties`: `spring.datasource.username=vicecompany` y la
+   contraseña nueva. La contraseña solo se escribe en el servidor.
+4. Reiniciar con `iniciar.bat` y comprobar que `/inconsistencias` muestra el mismo total
+   que antes, sin errores en la ventana ni en `logs/vicecompany.log`.
+
+Si al agregar una consulta nueva aparece `The SELECT permission was denied`, falta dar
+permiso a esa columna en el script. Para volver atrás: poner otra vez el usuario anterior en
+las propiedades y reiniciar; el script trae al final cómo eliminar el usuario.
+
+Hacer este cambio por separado de la puesta en marcha (un cambio a la vez).
+
 ## Desarrollo
 
 ```bash
@@ -96,6 +129,11 @@ la aplicación. Pendiente: instalarla como servicio de Windows.
 3. Activar `vice.sincronizacion.cron=0 0 * * * *` con la escritura habilitada y **cerrar
    el JSP**, para que no haya dos procesos sincronizando.
 4. Revisar a la hora en punto la página y `logs/vicecompany.log`.
+
+### Vuelta atrás
+
+Si algo no se ve bien: detener ViceCompany (Ctrl+C) y abrir otra vez el JSP. Todo queda
+como antes; ViceCompany no cambia la estructura de la base.
 
 ## Estructura
 

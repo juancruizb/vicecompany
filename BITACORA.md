@@ -61,6 +61,13 @@ Actualizado: 2026-11-07. Todo el código está en GitHub (`main`) y las 27 prueb
      en `logs\vicecompany.log`.
   4. Si todo está bien: `vice.sincronizacion.habilitada=true`, reiniciar, cerrar el JSP y
      revisar la siguiente hora en punto.
+- **En curso (2026-11-07):** cambiar `sa` por el usuario `vicecompany`:
+  1. Ejecutar `scripts/create-sql-user.sql` en el servidor (con la contraseña nueva) y su
+     sección "Verificación".
+  2. En `F:\ViceCompany2\despliegue\application-local.properties`: `username=vicecompany` y
+     la contraseña nueva. Reiniciar y comprobar que `/inconsistencias` muestra el mismo total.
+  3. Al confirmarlo: actualizar el usuario en el `despliegue/` local (contraseña solo en el
+     servidor) y marcar el pendiente. Detalle en el README, "Usuario de base de datos".
 - **Consultar por URL:** funciona solo desde el propio servidor (`server.address=127.0.0.1`),
   por ejemplo `http://localhost:8090/inconsistencias?ticket=164830`. Abrirla desde otras
   máquinas requiere quitar esa restricción, abrir el puerto 8090 en el firewall y, antes,
