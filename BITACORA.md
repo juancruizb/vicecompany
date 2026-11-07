@@ -46,6 +46,26 @@ vienen del AD. Reemplaza la página `sync_vice_cia.jsp` de una app JSP/Servlets 
 - Login con usuario **en memoria** (`operador` / `911911`), temporal.
 - 27 pruebas automáticas (`./mvnw test`), sin base de datos real.
 
+## Dónde quedamos (para retomar)
+
+Actualizado: 2026-11-07. Todo el código está en GitHub (`main`) y las 27 pruebas pasan.
+
+- **Servidor:** el JSP `sync_vice_cia.jsp` sigue siendo el que sincroniza. ViceCompany está
+  copiado en `F:\ViceCompany2\despliegue` (jar actual, cron cada hora, escritura en `false`),
+  pero **todavía no se ha puesto en marcha** la tarea programada allí.
+- **Próximo paso (mañana):** primer punto de "Pendiente → Puesta en marcha":
+  1. Ejecutar `iniciar.bat` en `F:\ViceCompany2\despliegue` (con la copia de pruebas detenida).
+  2. Entrar en http://localhost:8090/login y abrir `/inconsistencias`: debe decir
+     "Sincronización automática activa".
+  3. Esperar a la hora en punto: debe aparecer "Omitida: modo solo lectura" en la página y
+     en `logs\vicecompany.log`.
+  4. Si todo está bien: `vice.sincronizacion.habilitada=true`, reiniciar, cerrar el JSP y
+     revisar la siguiente hora en punto.
+- **Consultar por URL:** funciona solo desde el propio servidor (`server.address=127.0.0.1`),
+  por ejemplo `http://localhost:8090/inconsistencias?ticket=164830`. Abrirla desde otras
+  máquinas requiere quitar esa restricción, abrir el puerto 8090 en el firewall y, antes,
+  tener usuarios reales en lugar de `operador`.
+
 ## Despliegue en el servidor
 
 - Acceso: RDP (no hay VPN). La base solo es accesible desde la red del servidor.
@@ -223,6 +243,12 @@ vienen del AD. Reemplaza la página `sync_vice_cia.jsp` de una app JSP/Servlets 
 - Se agregó `README.md` (qué hace, configuración, despliegue y operación) y se pusieron al
   día `CLAUDE.md`, el estado actual y los pendientes de esta bitácora.
 
+### 2026-11-07 — Cierre de la jornada
+
+- Se aclaró cómo consultar la app por URL (solo desde el servidor; ver "Dónde quedamos").
+- Se agregó a esta bitácora la sección "Dónde quedamos (para retomar)" con el paso a paso
+  del día siguiente. Sin cambios de código.
+
 ## Conceptos aprendidos
 
 **Refactorizar**: cambiar cómo está escrito u organizado el código sin cambiar lo que hace.
@@ -318,6 +344,8 @@ historial de Git. Para retomar una conversación completa: `claude --continue` o
 - [ ] Login: reemplazar el usuario en memoria `operador`/`911911` por usuarios reales (no
   usar las tablas de usuarios de ServiceDesk Plus para validar contraseñas).
 - [ ] Considerar hacer privado el repositorio de GitHub.
+- [ ] Si se necesita abrir la app desde otras máquinas: usuarios reales primero, luego quitar
+  `server.address=127.0.0.1` y abrir el puerto 8090 en el firewall del servidor.
 
 **Datos**
 
