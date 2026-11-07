@@ -64,6 +64,8 @@ Actualizado: 2026-11-07. Todo el código está en GitHub (`main`) y las 27 prueb
 - **En curso (2026-11-07):** cambiar `sa` por el usuario `vicecompany`:
   1. Ejecutar `scripts/create-sql-user.sql` en el servidor (con la contraseña nueva) y su
      sección "Verificación".
+     Hecho: verificación correcta (14 permisos, lectura permitida y `SELECT *` rechazado).
+     Pendiente: cambiar la contraseña (`ALTER LOGIN`), porque quedó visible en una captura.
   2. En `F:\ViceCompany2\despliegue\application-local.properties`: `username=vicecompany` y
      la contraseña nueva. Reiniciar y comprobar que `/inconsistencias` muestra el mismo total.
   3. Al confirmarlo: actualizar el usuario en el `despliegue/` local (contraseña solo en el

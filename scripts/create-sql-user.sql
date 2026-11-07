@@ -54,7 +54,7 @@ GO
 /* ---------------------------------------------------------------------------
    Verificación (ejecutar después; no cambia datos)
    --------------------------------------------------------------------------- */
--- Permisos asignados: deben salir 5 SELECT y 1 UPDATE, con sus columnas.
+-- Permisos asignados: una fila por columna, 14 en total (12 SELECT y 2 UPDATE).
 SELECT pr.name AS usuario, pe.permission_name AS permiso, o.name AS tabla, c.name AS columna
   FROM sys.database_permissions pe
   JOIN sys.database_principals pr ON pe.grantee_principal_id = pr.principal_id
@@ -64,8 +64,9 @@ SELECT pr.name AS usuario, pe.permission_name AS permiso, o.name AS tabla, c.nam
  ORDER BY o.name, pe.permission_name, c.name;
 GO
 
--- Probar como el usuario nuevo: la primera consulta debe funcionar, la segunda debe fallar
--- con "The SELECT permission was denied" (no puede leer otras columnas).
+-- Probar como el usuario nuevo: la primera consulta debe funcionar (5 filas); la segunda
+-- DEBE fallar con varios "Msg 230 ... The SELECT permission was denied on the column ..."
+-- (en rojo). Ese error es el resultado esperado: prueba que no puede leer otras columnas.
 EXECUTE AS USER = N'vicecompany';
 SELECT TOP 5 WORKORDERID, UDF_CHAR20, UDF_CHAR19 FROM dbo.Request_Additional_Fields_1;
 SELECT TOP 1 * FROM dbo.WorkOrder;

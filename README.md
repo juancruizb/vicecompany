@@ -74,8 +74,9 @@ No puede borrar, insertar, cambiar la estructura ni leer otras tablas o columnas
 1. En el servidor, con SQL Server Management Studio y un usuario administrador, abrir el
    script, cambiar `CAMBIAR_CONTRASENA` por una contraseña fuerte (sin guardar el archivo) y
    ejecutarlo.
-2. Ejecutar la sección "Verificación": debe listar 5 permisos `SELECT` y 1 `UPDATE`; la
-   prueba como `vicecompany` funciona en las columnas permitidas y falla con `SELECT *`.
+2. Ejecutar la sección "Verificación": debe listar 14 filas, una por columna (12 `SELECT`
+   y 2 `UPDATE`). La prueba como `vicecompany` lee 5 filas y luego `SELECT *` **debe**
+   fallar con varios `Msg 230 ... permission was denied` en rojo: es el resultado esperado.
 3. En `application-local.properties`: `spring.datasource.username=vicecompany` y la
    contraseña nueva. La contraseña solo se escribe en el servidor.
 4. Reiniciar con `iniciar.bat` y comprobar que `/inconsistencias` muestra el mismo total
