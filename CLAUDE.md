@@ -6,7 +6,7 @@ Proyecto piloto para aprender IntelliJ IDEA y Spring Boot. El autor viene de Pyt
 ## Al empezar cada sesión
 
 - Leer `BITACORA.md`: tiene el estado actual, el historial y los pendientes.
-- Responder en español.
+- Responder en el idioma en que pregunte el usuario: en español si pregunta en español, en inglés si pregunta en inglés.
 - Explicar con comparaciones de Python/Django cuando ayuden, y con ejemplos de los archivos
   de este proyecto.
 
