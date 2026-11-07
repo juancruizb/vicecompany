@@ -10,7 +10,7 @@ Carpeta: F:\ViceCompany2\despliegue
   iniciar.bat                     arranca la aplicación
   jdk21.zip / jdk-21...\          Java 21 portable (no toca el Java 8 del servidor)
   logs\vicecompany.log            registro de lo que hace
-  LEEME.txt                       esta guía
+  READ-ME.txt                     esta guía
 
 
 1. ARRANCAR

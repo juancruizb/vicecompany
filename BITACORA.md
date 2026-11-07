@@ -271,7 +271,7 @@ Actualizado: 2026-11-07. Todo el código está en GitHub (`main`) y las 27 prueb
   `UDF_CHAR19` de `Request_Additional_Fields_1`. Incluye verificación y cómo eliminarlo.
   La contraseña se escribe en el servidor, no en el repositorio.
 
-- `scripts/LEEME.txt`: guía de operación para el servidor (arrancar, detener, reiniciar, los
+- `scripts/READ-ME.txt`: guía de operación para el servidor (arrancar, detener, reiniciar, los
   cuatro modos según `cron` y `habilitada`, cómo revisar y cómo volver atrás). Reemplaza al
   `LEEME.txt` viejo de `despliegue/`.
 
